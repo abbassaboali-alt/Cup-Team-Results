@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Prudle Activities Results</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  --blue:#164478;
+  --blue2:#2467a5;
+  --gold:#f4b942;
+  --green:#17a673;
+  --red:#e74c3c;
+  --bg:#f3f7fb;
+  --text:#18324b;
+  --muted:#6b7b8d;
+  --border:#dce6ef;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Tajawal",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 5%,rgba(36,103,165,.13),transparent 24%),
+    radial-gradient(circle at 90% 95%,rgba(244,185,66,.16),transparent 25%),
+    var(--bg);
+  color:var(--text);
+}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+
+.topbar{
+  min-height:76px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;
+  padding:13px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  box-shadow:0 6px 18px rgba(22,68,120,.22);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:50px;height:50px;border-radius:15px;background:#fff;color:var(--blue);
+  display:grid;place-items:center;font-size:21px;font-weight:900
+}
+.brand h1{margin:0;font-size:21px}
+.brand small{opacity:.83}
+.header-badge{
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.14);
+  padding:9px 14px;border-radius:999px;font-weight:900
+}
+
+.container{width:min(1320px,96%);margin:24px auto 50px}
+.panel{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:22px;
+  box-shadow:0 12px 35px rgba(31,70,102,.09);
+  padding:20px;
+  margin-bottom:18px
+}
+.panel-title{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:16px;flex-wrap:wrap
+}
+.panel-title h2{margin:0;font-size:22px}
+
+.filters{
+  display:grid;
+  grid-template-columns:repeat(8,minmax(150px,1fr));
+  gap:12px
+}
+.field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}
+.field select,.field input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:11px 12px;
+  background:#fff;
+  outline:none
+}
+.field select:focus,.field input:focus{
+  border-color:var(--blue2);
+  box-shadow:0 0 0 3px rgba(36,103,165,.1)
+}
+
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.btn{
+  border:none;border-radius:12px;padding:10px 15px;font-weight:900;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff}
+.btn-light{background:#edf4fa;color:var(--blue)}
+.btn-green{background:var(--green);color:#fff}
+.btn-gold{background:var(--gold);color:#493500}
+.btn-danger{background:var(--red);color:#fff}
+.btn-small{padding:7px 10px;font-size:12px}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(170px,1fr));
+  gap:13px
+}
+.stat{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:17px;
+  position:relative;
+  overflow:hidden
+}
+.stat:before{
+  content:"";
+  position:absolute;
+  left:0;top:0;width:6px;height:100%;
+  background:var(--blue2)
+}
+.stat.gold:before{background:var(--gold)}
+.stat.green:before{background:var(--green)}
+.stat.red:before{background:var(--red)}
+.stat .label{color:var(--muted);font-weight:800;font-size:13px}
+.stat .value{font-size:30px;font-weight:900;margin-top:6px;color:var(--blue)}
+.stat .sub{color:var(--muted);font-size:12px;margin-top:4px}
+
+.leaders{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px
+}
+.winner-card{
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  background:linear-gradient(180deg,#fffdf6,#fff)
+}
+.winner-icon{font-size:64px}
+.winner-card h3{margin:7px 0;color:var(--blue)}
+.winner-name{font-size:22px;font-weight:900}
+.winner-meta{color:var(--muted);margin-top:7px;line-height:1.8}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:16px
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1280px;
+  background:#fff
+}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:var(--blue);
+  color:#fff;
+  padding:12px 10px;
+  font-size:13px;
+  white-space:nowrap
+}
+tbody td{
+  padding:11px 9px;
+  border-bottom:1px solid #edf2f6;
+  text-align:center;
+  font-size:13px
+}
+tbody tr:hover{background:#f8fbfd}
+.rank{
+  width:34px;height:34px;border-radius:50%;
+  display:inline-grid;place-items:center;font-weight:900;
+  background:#edf4fa;color:var(--blue)
+}
+.rank.top1{background:#fff0b5;color:#7d5d00}
+.rank.top2{background:#eef1f4;color:#4f5d6a}
+.rank.top3{background:#f5dcc8;color:#844d27}
+
+.medal-rank{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:86px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.medal-rank.gold{
+  background:linear-gradient(135deg,#fff2a8,#f4b942);
+  color:#6e5000;
+  box-shadow:0 5px 14px rgba(244,185,66,.28);
+}
+.medal-rank.silver{
+  background:linear-gradient(135deg,#f5f7fa,#c9d0d8);
+  color:#46515d;
+  box-shadow:0 5px 14px rgba(120,130,140,.18);
+}
+.medal-rank i{font-size:18px}
+
+.pagination-box{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.page-btn{
+  border:none;
+  border-radius:12px;
+  padding:10px 16px;
+  font-weight:900;
+  background:#edf4fa;
+  color:var(--blue);
+}
+.page-btn.active{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;
+}
+.page-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.page-note{
+  width:100%;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800;
+  margin-top:2px;
+}
+
+.score-chip{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:900
+}
+.score-high{background:#e8faf2;color:var(--green)}
+.score-mid{background:#fff6d8;color:#8c6900}
+.score-low{background:#fff0ee;color:var(--red)}
+
+.empty{
+  text-align:center;
+  padding:40px 15px;
+  color:var(--muted);
+  font-weight:800
+}
+.loading{text-align:center;padding:30px;color:var(--muted)}
+
+/* PDF report */
+.pdf-report{
+  position:fixed;
+  left:-20000px;
+  top:0;
+  width:1120px;
+  background:#fff;
+  color:#18324b;
+  padding:34px;
+  font-family:"Tajawal",Arial,sans-serif;
+}
+.pdf-header{
+  background:#164478;
+  color:#fff;
+  border-radius:18px;
+  padding:20px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px
+}
+.pdf-brand{display:flex;align-items:center;gap:14px}
+.pdf-logo{
+  width:64px;height:64px;border-radius:18px;
+  background:#fff;color:#164478;
+  display:grid;place-items:center;
+  font-size:27px;font-weight:900
+}
+.pdf-header h1{margin:0;font-size:27px}
+.pdf-header p{margin:5px 0 0;opacity:.86}
+.pdf-date{text-align:right;font-weight:800}
+.pdf-filters{
+  margin:16px 0;
+  padding:13px 16px;
+  border:1px solid #dce6ef;
+  border-radius:14px;
+  background:#f7fafc;
+  line-height:1.8
+}
+.pdf-stats{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin:15px 0
+}
+.pdf-stat{
+  border:1px solid #dce6ef;
+  border-radius:14px;
+  padding:13px;
+  text-align:center;
+  background:#fff
+}
+.pdf-stat b{display:block;font-size:24px;color:#164478;margin-top:5px}
+.pdf-winners{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:15px 0
+}
+.pdf-winner{
+  border:1px solid #dce6ef;
+  border-radius:15px;
+  padding:16px;
+  text-align:center;
+  background:#fffdf6
+}
+.pdf-winner h3{margin:4px 0;color:#164478}
+.pdf-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:10px
+}
+.pdf-table th{
+  background:#164478;
+  color:#fff;
+  padding:8px 4px;
+  border:1px solid #dce6ef
+}
+.pdf-table td{
+  border:1px solid #dce6ef;
+  padding:7px 4px;
+  text-align:center;
+  overflow-wrap:anywhere
+}
+.pdf-table tr:nth-child(even){background:#f8fbfd}
+.pdf-footer{
+  margin-top:15px;
+  text-align:center;
+  color:#6b7b8d;
+  font-size:11px
+}
+
+/* Professional PDF pages */
+.pdf-page{
+  position:fixed;
+  left:-20000px;
+  top:0;
+  width:1120px;
+  min-height:760px;
+  background:#fff;
+  color:#18324b;
+  padding:34px;
+  font-family:"Tajawal",Arial,sans-serif;
+}
+
+.pdf-cover{
+  background:
+    radial-gradient(circle at 10% 10%,rgba(244,185,66,.20),transparent 28%),
+    radial-gradient(circle at 90% 90%,rgba(36,103,165,.16),transparent 30%),
+    #ffffff;
+}
+
+.pdf-cover-title{
+  text-align:center;
+  margin:22px 0 24px;
+}
+
+.pdf-cover-title h2{
+  margin:0;
+  font-size:32px;
+  color:#164478;
+}
+
+.pdf-cover-title p{
+  margin:8px 0 0;
+  color:#6b7b8d;
+  font-weight:800;
+}
+
+.pdf-podium{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+  margin-top:18px;
+}
+
+.pdf-podium-card{
+  border-radius:24px;
+  padding:24px;
+  text-align:center;
+  min-height:385px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.pdf-podium-card.gold{
+  background:linear-gradient(145deg,#fff9d9,#f6d365);
+  border:2px solid #e6b52b;
+  box-shadow:0 16px 35px rgba(230,181,43,.25);
+}
+
+.pdf-podium-card.silver{
+  background:linear-gradient(145deg,#f8fafc,#d7dde4);
+  border:2px solid #b7c0ca;
+  box-shadow:0 16px 35px rgba(120,130,140,.18);
+}
+
+.pdf-podium-icon{
+  font-size:78px;
+  margin-bottom:10px;
+}
+
+.pdf-podium-rank{
+  display:inline-block;
+  margin:0 auto 12px;
+  padding:7px 15px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:15px;
+}
+
+.pdf-podium-card.gold .pdf-podium-rank{
+  background:#f4b942;
+  color:#5c4300;
+}
+
+.pdf-podium-card.silver .pdf-podium-rank{
+  background:#c5ccd4;
+  color:#3e4852;
+}
+
+.pdf-podium-name{
+  font-size:27px;
+  font-weight:900;
+  color:#164478;
+  margin:8px 0;
+}
+
+.pdf-podium-meta{
+  font-size:14px;
+  line-height:1.9;
+  font-weight:700;
+}
+
+.pdf-podium-score{
+  font-size:32px;
+  font-weight:900;
+  margin:12px 0 4px;
+  color:#17a673;
+}
+
+.pdf-section-title{
+  margin:18px 0 12px;
+  padding:12px 15px;
+  border-radius:14px;
+  background:#edf4fa;
+  color:#164478;
+  font-size:20px;
+  font-weight:900;
+}
+
+.pdf-empty-box{
+  border:1px dashed #b7c8d8;
+  border-radius:16px;
+  padding:35px;
+  text-align:center;
+  color:#6b7b8d;
+  font-weight:800;
+  margin-top:20px;
+}
+
+.pdf-page-number{
+  margin-top:12px;
+  text-align:right;
+  color:#6b7b8d;
+  font-size:11px;
+  font-weight:800;
+}
+
+@media(max-width:1000px){
+  .filters{grid-template-columns:repeat(3,1fr)}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .leaders{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  .topbar{align-items:flex-start;flex-direction:column}
+  .container{width:96%;margin-top:14px}
+  .filters{grid-template-columns:1fr}
+  .summary-grid{grid-template-columns:1fr}
+  .panel{padding:15px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">P</div>
+    <div>
+      <h1>Prudle Activities Results</h1>
+      <small>Educational and Recreational Activity Results</small>
+    </div>
+  </div>
+
+  <div class="header-badge">
+    <i class="fa-solid fa-chart-column"></i>
+    Results Dashboard
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2><i class="fa-solid fa-filter"></i> Filters</h2>
+    </div>
+
+    <div class="filters">
+
+      <div class="field">
+        <label>Activity Date</label>
+        <select id="dateFilter" onchange="applyFilters()">
+          <option value="">Select Date</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Branch</label>
+        <select id="branchFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Department</label>
+        <select id="sectionFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Trainer</label>
+        <select id="trainerFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Course</label>
+        <select id="courseFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Activity</label>
+        <select id="activityFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Period</label>
+        <select id="periodFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Answered By</label>
+        <select id="participantFilter" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="loadResults()">
+        <i class="fa-solid fa-rotate-right"></i>
+        Refresh Results
+      </button>
+
+      <button class="btn btn-light" onclick="resetFilters()">
+        <i class="fa-solid fa-filter-circle-xmark"></i>
+        Clear Filters
+      </button>
+
+      <button class="btn btn-green" onclick="exportCSV()">
+        <i class="fa-solid fa-file-csv"></i>
+        Export CSV
+      </button>
+
+      <button class="btn btn-gold" onclick="exportProfessionalPDF()">
+        <i class="fa-solid fa-file-pdf"></i>
+        Professional PDF
+      </button>
+
+      <button class="btn btn-danger" onclick="deleteAllResults()">
+        <i class="fa-solid fa-trash"></i>
+        Delete All Results
+      </button>
+    </div>
+  </section>
+
+  <section class="summary-grid">
+    <div class="stat">
+      <div class="label">Total Attempts</div>
+      <div id="totalAttempts" class="value">0</div>
+      <div class="sub">Based on current filters</div>
+    </div>
+
+    <div class="stat green">
+      <div class="label">Average Percentage</div>
+      <div id="averagePercent" class="value">0%</div>
+      <div class="sub">Average of all results</div>
+    </div>
+
+    <div class="stat gold">
+      <div class="label">Highest Score</div>
+      <div id="highestPercent" class="value">0%</div>
+      <div class="sub">Best recorded attempt</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Courses</div>
+      <div id="coursesCount" class="value">0</div>
+      <div class="sub">Courses with results</div>
+    </div>
+
+    <div class="stat red">
+      <div class="label">Activities</div>
+      <div id="activitiesCount" class="value">0</div>
+      <div class="sub">Activities with results</div>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:18px">
+    <div class="panel-title">
+      <h2><i class="fa-solid fa-trophy"></i> Top Performance</h2>
+    </div>
+
+    <div class="leaders">
+      <div class="winner-card">
+        <div class="winner-icon">🏆</div>
+        <h3>Winning Course</h3>
+        <div id="bestCourseName" class="winner-name">—</div>
+        <div id="bestCourseMeta" class="winner-meta">No data available</div>
+      </div>
+
+      <div class="winner-card">
+        <div class="winner-icon">🥇</div>
+        <h3>Winning Group / Team</h3>
+        <div id="winnerName" class="winner-name">—</div>
+        <div id="winnerMeta" class="winner-meta">No data available</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2><i class="fa-solid fa-table-list"></i> Results Details</h2>
+      <span id="rowsCount" style="font-weight:900;color:var(--blue)">0 records</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Activity</th>
+            <th>Answered By Trainer</th>
+            <th>Trainer Department</th>
+            <th>Course</th>
+            <th>Branch</th>
+            <th>Period</th>
+            <th>Winning Group</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Date</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody id="resultsBody">
+          <tr>
+            <td colspan="12" class="loading">
+              Loading results...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="resultsPagination" class="pagination-box"></div>
+  </section>
+
+</main>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
+  authDomain:"prudle-system.firebaseapp.com",
+  projectId:"prudle-system"
+});
+
+const db = firebase.firestore();
+const RESULTS_COLLECTION = "FunActivityResults";
+
+let ALL_RESULTS = [];
+let FILTERED_RESULTS = [];
+
+/*
+  Results pagination:
+  Page 1 displays only the best two results.
+  Page 2 displays all remaining results.
+*/
+let RESULTS_PAGE = 1;
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function clean(value){
+  return String(value ?? "").trim();
+}
+
+function getDateValue(value){
+  if(!value) return null;
+
+  if(typeof value.toDate === "function"){
+    return value.toDate();
+  }
+
+  const date = new Date(value);
+  return isNaN(date) ? null : date;
+}
+
+function formatDate(value){
+  const date = getDateValue(value);
+
+  if(!date){
+    return "—";
+  }
+
+  return date.toLocaleString("en-GB",{
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+function getDateKey(value){
+  const date = getDateValue(value);
+
+  if(!date){
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(
+    date.getMonth() + 1
+  ).padStart(2,"0");
+
+  const day = String(
+    date.getDate()
+  ).padStart(2,"0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatDateOnly(value){
+  const date = getDateValue(value);
+
+  if(!date){
+    return "—";
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }
+  );
+}
+
+function getAnsweredTrainerDepartment(item){
+  return clean(
+    item?.participantDepartment ||
+    item?.answeredTrainerDepartment ||
+    item?.trainerDepartment ||
+    item?.section ||
+    ""
+  ) || "Not specified";
+}
+
+function uniqueValues(field){
+  return [...new Set(
+    ALL_RESULTS
+      .map(item=>clean(item[field]))
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b));
+}
+
+function fillSelect(id,values){
+  const select = document.getElementById(id);
+  const current = select.value;
+
+  select.innerHTML =
+    `<option value="">All</option>` +
+    values.map(value=>
+      `<option value="${esc(value)}">${esc(value)}</option>`
+    ).join("");
+
+  if(values.includes(current)){
+    select.value = current;
+  }
+}
+
+function fillFilters(){
+
+  const dateSelect =
+    document.getElementById(
+      "dateFilter"
+    );
+
+  const currentDate =
+    dateSelect.value;
+
+  const dates = [
+    ...new Set(
+      ALL_RESULTS
+        .map(item=>
+          getDateKey(
+            item.createdAt
+          )
+        )
+        .filter(Boolean)
+    )
+  ].sort((a,b)=>
+    b.localeCompare(a)
+  );
+
+  dateSelect.innerHTML =
+    `<option value="">Select Date</option>` +
+    dates.map(dateKey=>`
+      <option value="${esc(dateKey)}">
+        ${esc(
+          formatDateOnly(
+            dateKey + "T12:00:00"
+          )
+        )}
+      </option>
+    `).join("");
+
+  if(dates.includes(currentDate)){
+    dateSelect.value =
+      currentDate;
+  }
+
+  fillSelect("branchFilter",uniqueValues("branch"));
+  fillSelect(
+    "sectionFilter",
+    [
+      ...new Set(
+        ALL_RESULTS
+          .map(item=>
+            getAnsweredTrainerDepartment(
+              item
+            )
+          )
+          .filter(value=>
+            value &&
+            value !== "Not specified"
+          )
+      )
+    ].sort((a,b)=>a.localeCompare(b))
+  );
+  fillSelect("trainerFilter",uniqueValues("trainerName"));
+  fillSelect("courseFilter",uniqueValues("courseName"));
+  fillSelect("activityFilter",uniqueValues("activityTitle"));
+  fillSelect("periodFilter",uniqueValues("period"));
+
+  const participants = [
+    ...new Set(
+      ALL_RESULTS
+        .map(item=>
+          clean(
+            item.participantName ||
+            item.participantUsername ||
+            item.participantId ||
+            (
+              item.anonymous
+                ? "Guest"
+                : ""
+            )
+          )
+        )
+        .filter(Boolean)
+    )
+  ].sort((a,b)=>a.localeCompare(b));
+
+  fillSelect(
+    "participantFilter",
+    participants
+  );
+}
+
+async function loadResults(){
+  const body = document.getElementById("resultsBody");
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="12" class="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Loading results...
+      </td>
+    </tr>
+  `;
+
+  try{
+    const snap = await db.collection(RESULTS_COLLECTION).get();
+
+    ALL_RESULTS = snap.docs.map(doc=>({
+      id:doc.id,
+      ...doc.data()
+    }));
+
+    ALL_RESULTS.sort((a,b)=>{
+      const dateA = getDateValue(a.createdAt)?.getTime() || 0;
+      const dateB = getDateValue(b.createdAt)?.getTime() || 0;
+      return dateB - dateA;
+    });
+
+    fillFilters();
+    applyFilters();
+
+  }catch(error){
+    console.error(error);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="12" class="empty" style="color:var(--red)">
+          Unable to load activity results.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function applyFilters(){
+
+  RESULTS_PAGE = 1;
+
+  const selectedDate =
+    document
+      .getElementById("dateFilter")
+      .value;
+
+  const branch = document.getElementById("branchFilter").value;
+  const section = document.getElementById("sectionFilter").value;
+  const trainer = document.getElementById("trainerFilter").value;
+  const course = document.getElementById("courseFilter").value;
+  const activity = document.getElementById("activityFilter").value;
+  const period = document.getElementById("periodFilter").value;
+
+  const participant =
+    document
+      .getElementById("participantFilter")
+      .value;
+
+  /*
+    Results remain hidden until an activity date
+    is selected from the dropdown.
+  */
+
+  if(!selectedDate){
+    FILTERED_RESULTS = [];
+
+    renderSummary();
+    renderLeaders();
+    renderTable(
+      "Select an activity date from the filter above to display results."
+    );
+
+    return;
+  }
+
+  FILTERED_RESULTS = ALL_RESULTS.filter(item=>
+    getDateKey(item.createdAt) === selectedDate &&
+    (!branch || clean(item.branch) === branch) &&
+    (
+      !section ||
+      getAnsweredTrainerDepartment(item) === section
+    ) &&
+    (!trainer || clean(item.trainerName) === trainer) &&
+    (!course || clean(item.courseName) === course) &&
+    (!activity || clean(item.activityTitle) === activity) &&
+    (!period || clean(item.period) === period) &&
+    (
+      !participant ||
+      clean(
+        item.participantName ||
+        item.participantUsername ||
+        item.participantId ||
+        (
+          item.anonymous
+            ? "Guest"
+            : ""
+        )
+      ) === participant
+    )
+  );
+
+  renderSummary();
+  renderLeaders();
+  renderTable();
+}
+
+function resetFilters(){
+  [
+    "dateFilter",
+    "branchFilter",
+    "sectionFilter",
+    "trainerFilter",
+    "courseFilter",
+    "activityFilter",
+    "periodFilter",
+    "participantFilter"
+  ].forEach(id=>{
+    document.getElementById(id).value = "";
+  });
+
+  applyFilters();
+}
+
+function getSummaryData(){
+  const total = FILTERED_RESULTS.length;
+  const percentages = FILTERED_RESULTS.map(item=>Number(item.percent || 0));
+
+  const average = total
+    ? Math.round(percentages.reduce((sum,value)=>sum + value,0) / total)
+    : 0;
+
+  const highest = percentages.length
+    ? Math.max(...percentages)
+    : 0;
+
+  const courses = new Set(
+    FILTERED_RESULTS.map(item=>clean(item.courseName)).filter(Boolean)
+  );
+
+  const activities = new Set(
+    FILTERED_RESULTS.map(item=>clean(item.activityTitle)).filter(Boolean)
+  );
+
+  return {
+    total,
+    average,
+    highest,
+    coursesCount:courses.size,
+    activitiesCount:activities.size
+  };
+}
+
+function renderSummary(){
+  const data = getSummaryData();
+
+  document.getElementById("totalAttempts").textContent = data.total;
+  document.getElementById("averagePercent").textContent = data.average + "%";
+  document.getElementById("highestPercent").textContent = data.highest + "%";
+  document.getElementById("coursesCount").textContent = data.coursesCount;
+  document.getElementById("activitiesCount").textContent = data.activitiesCount;
+  document.getElementById("rowsCount").textContent =
+    data.total + (data.total === 1 ? " record" : " records");
+}
+
+function getBestCourseData(){
+  if(!FILTERED_RESULTS.length){
+    return null;
+  }
+
+  const grouped = {};
+
+  FILTERED_RESULTS.forEach(item=>{
+
+    const key =
+      clean(item.courseId) ||
+      clean(item.courseName) ||
+      "unknown";
+
+    if(!grouped[key]){
+      grouped[key] = {
+        name:
+          item.courseName ||
+          "Unspecified Course",
+
+        branch:
+          item.branch ||
+          "Not specified",
+
+        section:
+          item.section ||
+          "Not specified",
+
+        answeredByNames:[],
+        departments:[],
+
+        totalCorrect:0,
+        totalQuestions:0,
+        attempts:0
+      };
+    }
+
+    grouped[key].totalCorrect +=
+      Number(item.score || 0);
+
+    grouped[key].totalQuestions +=
+      Number(item.total || 0);
+
+    grouped[key].attempts++;
+
+    const answeredBy =
+      clean(
+        item.participantName ||
+        item.participantUsername ||
+        item.participantId ||
+        (
+          item.anonymous
+            ? "Guest"
+            : ""
+        )
+      );
+
+    if(
+      answeredBy &&
+      !grouped[key]
+        .answeredByNames
+        .includes(answeredBy)
+    ){
+      grouped[key]
+        .answeredByNames
+        .push(answeredBy);
+    }
+
+    const department =
+      getAnsweredTrainerDepartment(
+        item
+      );
+
+    if(
+      department &&
+      !grouped[key]
+        .departments
+        .includes(department)
+    ){
+      grouped[key]
+        .departments
+        .push(department);
+    }
+  });
+
+  return Object.values(grouped)
+    .map(item=>({
+      ...item,
+
+      answeredBy:
+        item.answeredByNames.length
+          ? item.answeredByNames.join(", ")
+          : "Not specified",
+
+      department:
+        item.departments.length
+          ? item.departments.join(", ")
+          : (
+              item.section ||
+              "Not specified"
+            ),
+
+      accuracy:item.totalQuestions
+        ? Math.round(
+            (
+              item.totalCorrect /
+              item.totalQuestions
+            ) * 100
+          )
+        : 0
+    }))
+    .sort((a,b)=>
+      /*
+        Winning course:
+        1. Highest total correct answers.
+        2. Highest accuracy if tied.
+        3. Highest attempts if still tied.
+      */
+
+      b.totalCorrect -
+      a.totalCorrect ||
+
+      b.accuracy -
+      a.accuracy ||
+
+      b.attempts -
+      a.attempts
+    )[0];
+}
+
+function getWinningGroupData(){
+  if(!FILTERED_RESULTS.length){
+    return null;
+  }
+
+  const grouped = {};
+
+  FILTERED_RESULTS.forEach(item=>{
+
+    const teams =
+      Array.isArray(item.teams)
+        ? item.teams
+        : [];
+
+    /*
+      New team-mode records contain a complete
+      teams array. Aggregate every Team A/B/C...
+      across the filtered results.
+    */
+
+    if(teams.length){
+
+      teams.forEach(team=>{
+
+        const name =
+          clean(team.name) ||
+          clean(team.letter)
+            ? (
+                clean(team.name) ||
+                `Team ${clean(team.letter)}`
+              )
+            : "Unnamed Team";
+
+        const key =
+          clean(item.courseId) +
+          "||" +
+          clean(name);
+
+        if(!grouped[key]){
+          grouped[key] = {
+            name,
+            courseName:
+              item.courseName ||
+              "Unspecified Course",
+
+            trainer:
+              item.trainerName ||
+              "Not specified",
+
+            totalCorrect:0,
+            totalAnswered:0,
+            appearances:0,
+            answeredByNames:[],
+            departments:[]
+          };
+        }
+
+        grouped[key].totalCorrect +=
+          Number(team.correct || 0);
+
+        grouped[key].totalAnswered +=
+          Number(
+            team.answered ||
+            team.assigned ||
+            0
+          );
+
+        grouped[key].appearances++;
+
+        const answeredBy =
+          clean(
+            item.participantName ||
+            item.participantUsername ||
+            item.participantId ||
+            (
+              item.anonymous
+                ? "Guest"
+                : ""
+            )
+          );
+
+        if(
+          answeredBy &&
+          !grouped[key]
+            .answeredByNames
+            .includes(answeredBy)
+        ){
+          grouped[key]
+            .answeredByNames
+            .push(answeredBy);
+        }
+
+        const department =
+          getAnsweredTrainerDepartment(
+            item
+          );
+
+        if(
+          department &&
+          !grouped[key]
+            .departments
+            .includes(department)
+        ){
+          grouped[key]
+            .departments
+            .push(department);
+        }
+      });
+
+      return;
+    }
+
+    /*
+      Compatibility with records that only saved
+      the winning group name.
+    */
+
+    const fallbackName =
+      clean(item.winningTeamName) ||
+      clean(item.group);
+
+    if(!fallbackName){
+      return;
+    }
+
+    const key =
+      clean(item.courseId) +
+      "||" +
+      fallbackName;
+
+    if(!grouped[key]){
+      grouped[key] = {
+        name:fallbackName,
+        courseName:
+          item.courseName ||
+          "Unspecified Course",
+
+        trainer:
+          item.trainerName ||
+          "Not specified",
+
+        totalCorrect:0,
+        totalAnswered:0,
+        appearances:0,
+        answeredByNames:[],
+        departments:[]
+      };
+    }
+
+    grouped[key].totalCorrect +=
+      Number(
+        item.winningTeamCorrect ||
+        item.score ||
+        0
+      );
+
+    grouped[key].totalAnswered +=
+      Number(item.total || 0);
+
+    grouped[key].appearances++;
+
+    const answeredBy =
+      clean(
+        item.participantName ||
+        item.participantUsername ||
+        item.participantId ||
+        (
+          item.anonymous
+            ? "Guest"
+            : ""
+        )
+      );
+
+    if(
+      answeredBy &&
+      !grouped[key]
+        .answeredByNames
+        .includes(answeredBy)
+    ){
+      grouped[key]
+        .answeredByNames
+        .push(answeredBy);
+    }
+
+    const department =
+      getAnsweredTrainerDepartment(
+        item
+      );
+
+    if(
+      department &&
+      !grouped[key]
+        .departments
+        .includes(department)
+    ){
+      grouped[key]
+        .departments
+        .push(department);
+    }
+  });
+
+  return Object.values(grouped)
+    .map(team=>({
+      ...team,
+
+      accuracy:team.totalAnswered
+        ? Math.round(
+            (
+              team.totalCorrect /
+              team.totalAnswered
+            ) * 100
+          )
+        : 0,
+
+      answeredBy:
+        team.answeredByNames?.length
+          ? team.answeredByNames.join(", ")
+          : "Not specified",
+
+      department:
+        team.departments?.length
+          ? team.departments.join(", ")
+          : "Not specified"
+    }))
+    .sort((a,b)=>
+      b.totalCorrect -
+      a.totalCorrect ||
+
+      b.accuracy -
+      a.accuracy ||
+
+      b.appearances -
+      a.appearances
+    )[0] || null;
+}
+
+function getWinnerData(){
+  if(!FILTERED_RESULTS.length){
+    return null;
+  }
+
+  return [...FILTERED_RESULTS].sort((a,b)=>
+    Number(b.percent || 0) - Number(a.percent || 0) ||
+    Number(b.score || 0) - Number(a.score || 0)
+  )[0];
+}
+
+function renderLeaders(){
+  const bestCourse =
+    getBestCourseData();
+
+  const winningGroup =
+    getWinningGroupData();
+
+  if(!bestCourse){
+    document
+      .getElementById("bestCourseName")
+      .textContent = "—";
+
+    document
+      .getElementById("bestCourseMeta")
+      .textContent =
+        "Select a date to display the winning course.";
+
+  }else{
+
+    document
+      .getElementById("bestCourseName")
+      .textContent =
+        bestCourse.name;
+
+    document
+      .getElementById("bestCourseMeta")
+      .innerHTML =
+        `Answered By Trainer: <b style="color:var(--green)">${esc(bestCourse.answeredBy)}</b><br>` +
+        `Answered Trainer Department: <b>${esc(bestCourse.department)}</b><br>` +
+        `Correct Answers: <b>${bestCourse.totalCorrect}</b><br>` +
+        `Total Questions: <b>${bestCourse.totalQuestions}</b><br>` +
+        `Accuracy: <b>${bestCourse.accuracy}%</b><br>` +
+        `Attempts: <b>${bestCourse.attempts}</b><br>` +
+        `Branch: <b>${esc(bestCourse.branch)}</b><br>` +
+        `<span style="color:var(--green);font-weight:900">` +
+        `This course is the winner because it has the highest number of correct answers.` +
+        `</span>`;
+  }
+
+  if(!winningGroup){
+
+    document
+      .getElementById("winnerName")
+      .textContent = "—";
+
+    document
+      .getElementById("winnerMeta")
+      .textContent =
+        "No Team A, B, C, D, E, or F result is available for the selected filters.";
+
+    return;
+  }
+
+  document
+    .getElementById("winnerName")
+    .textContent =
+      winningGroup.name;
+
+  document
+    .getElementById("winnerMeta")
+    .innerHTML =
+      `Winning Group: <b>${esc(winningGroup.name)}</b><br>` +
+      `Answered By Trainer: <b style="color:var(--green)">${esc(winningGroup.answeredBy)}</b><br>` +
+      `Answered Trainer Department: <b>${esc(winningGroup.department)}</b><br>` +
+      `Correct Answers: <b>${winningGroup.totalCorrect}</b><br>` +
+      `Answered Questions: <b>${winningGroup.totalAnswered}</b><br>` +
+      `Accuracy: <b>${winningGroup.accuracy}%</b><br>` +
+      `Course: <b>${esc(winningGroup.courseName)}</b>`;
+}
+
+function getScoreClass(percent){
+  const value = Number(percent || 0);
+
+  if(value >= 80) return "score-high";
+  if(value >= 60) return "score-mid";
+  return "score-low";
+}
+
+function getSortedResults(){
+  return [...FILTERED_RESULTS].sort((a,b)=>
+    Number(b.score || 0) -
+    Number(a.score || 0) ||
+
+    Number(b.percent || 0) -
+    Number(a.percent || 0) ||
+
+    (
+      getDateValue(b.createdAt)?.getTime() || 0
+    ) -
+    (
+      getDateValue(a.createdAt)?.getTime() || 0
+    )
+  );
+}
+
+function changeResultsPage(page){
+  const sorted = getSortedResults();
+  const hasSecondPage = sorted.length > 2;
+
+  if(page === 2 && !hasSecondPage){
+    RESULTS_PAGE = 1;
+  }else{
+    RESULTS_PAGE = page === 2 ? 2 : 1;
+  }
+
+  renderTable();
+}
+
+function renderPagination(total){
+  const box =
+    document.getElementById("resultsPagination");
+
+  if(!box){
+    return;
+  }
+
+  if(total <= 2){
+    box.innerHTML = total
+      ? `<div class="page-note">All results are displayed on the first page.</div>`
+      : "";
+    return;
+  }
+
+  box.innerHTML = `
+    <button
+      class="page-btn ${RESULTS_PAGE === 1 ? "active" : ""}"
+      type="button"
+      onclick="changeResultsPage(1)">
+      <i class="fa-solid fa-trophy"></i>
+      Page 1 — Gold & Silver
+    </button>
+
+    <button
+      class="page-btn ${RESULTS_PAGE === 2 ? "active" : ""}"
+      type="button"
+      onclick="changeResultsPage(2)">
+      <i class="fa-solid fa-list-ol"></i>
+      Page 2 — Remaining Results
+    </button>
+
+    <div class="page-note">
+      Page 1 shows the best two results only. Page 2 shows the remaining ${total - 2} result${total - 2 === 1 ? "" : "s"}.
+    </div>
+  `;
+}
+
+function renderTable(emptyMessage="No results match the current filters."){
+  const body =
+    document.getElementById("resultsBody");
+
+  if(!FILTERED_RESULTS.length){
+    body.innerHTML = `
+      <tr>
+        <td colspan="12" class="empty">
+          ${esc(emptyMessage)}
+        </td>
+      </tr>
+    `;
+
+    renderPagination(0);
+    return;
+  }
+
+  const sorted = getSortedResults();
+
+  if(
+    RESULTS_PAGE === 2 &&
+    sorted.length <= 2
+  ){
+    RESULTS_PAGE = 1;
+  }
+
+  const visibleResults =
+    RESULTS_PAGE === 1
+      ? sorted.slice(0,2)
+      : sorted.slice(2);
+
+  body.innerHTML = visibleResults.map((item,pageIndex)=>{
+
+    const realIndex =
+      RESULTS_PAGE === 1
+        ? pageIndex
+        : pageIndex + 2;
+
+    let rankHtml = "";
+
+    if(realIndex === 0){
+      rankHtml = `
+        <span class="medal-rank gold">
+          <i class="fa-solid fa-trophy"></i>
+          Gold
+        </span>
+      `;
+    }else if(realIndex === 1){
+      rankHtml = `
+        <span class="medal-rank silver">
+          <i class="fa-solid fa-medal"></i>
+          Silver
+        </span>
+      `;
+    }else{
+      rankHtml = `
+        <span class="rank ${realIndex === 2 ? "top3" : ""}">
+          ${realIndex + 1}
+        </span>
+      `;
+    }
+
+    return `
+      <tr>
+        <td>${rankHtml}</td>
+
+        <td>
+          <b>${esc(item.activityTitle || "—")}</b>
+        </td>
+
+        <td>
+          <b>${esc(
+            item.participantName ||
+            item.participantUsername ||
+            item.participantId ||
+            (
+              item.anonymous
+                ? "Guest"
+                : "—"
+            )
+          )}</b>
+        </td>
+
+        <td>
+          ${esc(
+            getAnsweredTrainerDepartment(item)
+          )}
+        </td>
+
+        <td>
+          ${esc(item.courseName || "—")}
+        </td>
+
+        <td>
+          ${esc(item.branch || "—")}
+        </td>
+
+        <td>
+          ${esc(item.period || "—")}
+        </td>
+
+        <td>
+          ${esc(
+            item.winningTeamName ||
+            item.group ||
+            "—"
+          )}
+        </td>
+
+        <td>
+          <b>
+            ${Number(item.score || 0)}
+            /
+            ${Number(item.total || 0)}
+          </b>
+        </td>
+
+        <td>
+          <span class="score-chip ${getScoreClass(item.percent)}">
+            ${Number(item.percent || 0)}%
+          </span>
+        </td>
+
+        <td>
+          ${formatDate(item.createdAt)}
+        </td>
+
+        <td>
+          <button
+            class="btn btn-danger btn-small"
+            onclick="deleteResult('${item.id}')">
+            <i class="fa-solid fa-trash"></i>
+            Delete
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  renderPagination(sorted.length);
+}
+
+async function deleteResult(id){
+  const record = ALL_RESULTS.find(item=>item.id === id);
+
+  const label = record
+    ? `${record.activityTitle || "Activity"} - ${record.courseName || "Course"}`
+    : "this result";
+
+  if(!confirm(`Delete ${label}?`)){
+    return;
+  }
+
+  try{
+    await db.collection(RESULTS_COLLECTION).doc(id).delete();
+
+    ALL_RESULTS = ALL_RESULTS.filter(item=>item.id !== id);
+
+    fillFilters();
+    applyFilters();
+
+    alert("The result was deleted successfully.");
+  }catch(error){
+    console.error(error);
+    alert("Unable to delete the result.");
+  }
+}
+
+async function deleteAllResults(){
+  if(!ALL_RESULTS.length){
+    alert("There are no results to delete.");
+    return;
+  }
+
+  const confirmation = prompt(
+    `This will permanently delete all ${ALL_RESULTS.length} results.\nType DELETE to confirm:`
+  );
+
+  if(confirmation !== "DELETE"){
+    alert("Deletion cancelled.");
+    return;
+  }
+
+  try{
+    while(true){
+      const snap = await db
+        .collection(RESULTS_COLLECTION)
+        .limit(400)
+        .get();
+
+      if(snap.empty){
+        break;
+      }
+
+      const batch = db.batch();
+
+      snap.docs.forEach(doc=>{
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+
+      if(snap.size < 400){
+        break;
+      }
+    }
+
+    ALL_RESULTS = [];
+    FILTERED_RESULTS = [];
+
+    fillFilters();
+    applyFilters();
+
+    alert("All results were deleted successfully.");
+  }catch(error){
+    console.error(error);
+    alert("Unable to delete all results.");
+  }
+}
+
+function csvEscape(value){
+  const text = String(value ?? "");
+
+  if(/[",\n]/.test(text)){
+    return `"${text.replaceAll('"','""')}"`;
+  }
+
+  return text;
+}
+
+function exportCSV(){
+  if(!FILTERED_RESULTS.length){
+    alert("There are no results to export.");
+    return;
+  }
+
+  const headers = [
+    "Activity",
+    "Answered By Trainer",
+    "Trainer Department",
+    "Course",
+    "Branch",
+    "Period",
+    "Winning Group",
+    "Winning Group Correct",
+    "Score",
+    "Total",
+    "Percentage",
+    "Date"
+  ];
+
+  const rows = FILTERED_RESULTS.map(item=>[
+    item.activityTitle || "",
+    item.participantName ||
+      item.participantUsername ||
+      item.participantId ||
+      (item.anonymous ? "Guest" : ""),
+    getAnsweredTrainerDepartment(
+      item
+    ),
+    item.courseName || "",
+    item.branch || "",
+    item.period || "",
+    item.winningTeamName ||
+      item.group ||
+      "",
+    Number(
+      item.winningTeamCorrect ||
+      0
+    ),
+    Number(item.score || 0),
+    Number(item.total || 0),
+    Number(item.percent || 0),
+    formatDate(item.createdAt)
+  ]);
+
+  const csv = "\uFEFF" + [headers,...rows]
+    .map(row=>row.map(csvEscape).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv],{
+    type:"text/csv;charset=utf-8"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "prudle-activity-results.csv";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+function getFilterText(){
+  const items = [
+    ["Activity Date","dateFilter"],
+    ["Branch","branchFilter"],
+    ["Department","sectionFilter"],
+    ["Trainer","trainerFilter"],
+    ["Course","courseFilter"],
+    ["Activity","activityFilter"],
+    ["Period","periodFilter"],
+    ["Answered By","participantFilter"]
+  ];
+
+  return items.map(([label,id])=>{
+    const select = document.getElementById(id);
+    const value = select.value
+      ? select.options[select.selectedIndex].text
+      : "All";
+
+    return `<b>${label}:</b> ${esc(value)}`;
+  }).join(" &nbsp; | &nbsp; ");
+}
+
+async function exportProfessionalPDF(){
+  if(!FILTERED_RESULTS.length){
+    alert("There are no results to export.");
+    return;
+  }
+
+  const sorted = getSortedResults();
+  const topTwo = sorted.slice(0,2);
+  const remaining = sorted.slice(2);
+  const summary = getSummaryData();
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf = new jsPDF({
+    orientation:"landscape",
+    unit:"mm",
+    format:"a4"
+  });
+
+  const pageWidth =
+    pdf.internal.pageSize.getWidth();
+
+  const pageHeight =
+    pdf.internal.pageSize.getHeight();
+
+  const margin = 7;
+  const renderWidth = 1120;
+
+  async function addDomPage(
+    element,
+    addNewPage=false
+  ){
+    document.body.appendChild(element);
+
+    try{
+      const canvas =
+        await html2canvas(element,{
+          scale:2,
+          useCORS:true,
+          backgroundColor:"#ffffff",
+          windowWidth:renderWidth
+        });
+
+      const imgData =
+        canvas.toDataURL("image/png",1.0);
+
+      const imgWidth =
+        pageWidth - (margin * 2);
+
+      const imgHeight =
+        canvas.height *
+        imgWidth /
+        canvas.width;
+
+      if(addNewPage){
+        pdf.addPage();
+      }
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        margin,
+        margin,
+        imgWidth,
+        Math.min(
+          imgHeight,
+          pageHeight - (margin * 2)
+        ),
+        undefined,
+        "FAST"
+      );
+
+    }finally{
+      element.remove();
+    }
+  }
+
+  function getParticipantName(item){
+    return (
+      item?.participantName ||
+      item?.participantUsername ||
+      item?.participantId ||
+      (
+        item?.anonymous
+          ? "Guest"
+          : "—"
+      )
+    );
+  }
+
+  function buildPodiumCard(
+    item,
+    rank
+  ){
+    const isGold =
+      rank === 1;
+
+    const cardClass =
+      isGold
+        ? "gold"
+        : "silver";
+
+    const icon =
+      isGold
+        ? "🏆"
+        : "🥈";
+
+    const label =
+      isGold
+        ? "1st Place — Gold"
+        : "2nd Place — Silver";
+
+    if(!item){
+      return `
+        <div class="pdf-podium-card ${cardClass}">
+          <div class="pdf-podium-icon">${icon}</div>
+          <div class="pdf-podium-rank">${label}</div>
+          <div class="pdf-podium-name">No Result</div>
+          <div class="pdf-podium-meta">
+            There is no second result for the selected filters.
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="pdf-podium-card ${cardClass}">
+        <div class="pdf-podium-icon">${icon}</div>
+
+        <div class="pdf-podium-rank">
+          ${label}
+        </div>
+
+        <div class="pdf-podium-name">
+          ${esc(
+            item.winningTeamName ||
+            item.group ||
+            getParticipantName(item)
+          )}
+        </div>
+
+        <div style="
+          font-size:18px;
+          font-weight:900;
+          color:#18324b;
+          margin-bottom:8px;
+        ">
+          ${esc(item.courseName || "—")}
+        </div>
+
+        <div class="pdf-podium-score">
+          ${Number(item.score || 0)}
+          /
+          ${Number(item.total || 0)}
+          —
+          ${Number(item.percent || 0)}%
+        </div>
+
+        <div class="pdf-podium-meta">
+          <b>Activity:</b>
+          ${esc(item.activityTitle || "—")}
+          <br>
+
+          <b>Answered By:</b>
+          ${esc(getParticipantName(item))}
+          <br>
+
+          <b>Department:</b>
+          ${esc(
+            getAnsweredTrainerDepartment(item)
+          )}
+          <br>
+
+          <b>Branch:</b>
+          ${esc(item.branch || "—")}
+          <br>
+
+          <b>Period:</b>
+          ${esc(item.period || "—")}
+          <br>
+
+          <b>Date:</b>
+          ${formatDate(item.createdAt)}
+        </div>
+      </div>
+    `;
+  }
+
+  /* ==========================================
+     PDF PAGE 1 — GOLD AND SILVER
+  ========================================== */
+
+  const cover =
+    document.createElement("div");
+
+  cover.className =
+    "pdf-page pdf-cover";
+
+  cover.innerHTML = `
+    <div class="pdf-header">
+      <div class="pdf-brand">
+        <div class="pdf-logo">P</div>
+
+        <div>
+          <h1>Prudle Activities Results</h1>
+          <p>Top Two Performance Awards</p>
+        </div>
+      </div>
+
+      <div class="pdf-date">
+        ${new Date().toLocaleString("en-GB")}
+      </div>
+    </div>
+
+    <div class="pdf-filters">
+      ${getFilterText()}
+    </div>
+
+    <div class="pdf-cover-title">
+      <h2>Top Two Results</h2>
+
+      <p>
+        Gold and silver awards based on correct answers,
+        percentage, and latest result when tied.
+      </p>
+    </div>
+
+    <div class="pdf-podium">
+      ${buildPodiumCard(topTwo[0],1)}
+      ${buildPodiumCard(topTwo[1],2)}
+    </div>
+
+    <div class="pdf-stats" style="margin-top:22px">
+      <div class="pdf-stat">
+        Total Attempts
+        <b>${summary.total}</b>
+      </div>
+
+      <div class="pdf-stat">
+        Average
+        <b>${summary.average}%</b>
+      </div>
+
+      <div class="pdf-stat">
+        Highest Score
+        <b>${summary.highest}%</b>
+      </div>
+
+      <div class="pdf-stat">
+        Courses
+        <b>${summary.coursesCount}</b>
+      </div>
+
+      <div class="pdf-stat">
+        Activities
+        <b>${summary.activitiesCount}</b>
+      </div>
+    </div>
+
+    <div class="pdf-footer">
+      Prudle Institute — Professional Activities Results
+    </div>
+
+    <div class="pdf-page-number">
+      Page 1
+    </div>
+  `;
+
+  await addDomPage(
+    cover,
+    false
+  );
+
+  /* ==========================================
+     PDF PAGE 2+ — REMAINING RESULTS
+  ========================================== */
+
+  const rowsPerPage = 12;
+
+  const pageChunks = [];
+
+  if(remaining.length){
+    for(
+      let i=0;
+      i<remaining.length;
+      i+=rowsPerPage
+    ){
+      pageChunks.push(
+        remaining.slice(
+          i,
+          i + rowsPerPage
+        )
+      );
+    }
+  }else{
+    pageChunks.push([]);
+  }
+
+  for(
+    let pageIndex=0;
+    pageIndex<pageChunks.length;
+    pageIndex++
+  ){
+    const chunk =
+      pageChunks[pageIndex];
+
+    const page =
+      document.createElement("div");
+
+    page.className =
+      "pdf-page";
+
+    page.innerHTML = `
+      <div class="pdf-header">
+        <div class="pdf-brand">
+          <div class="pdf-logo">P</div>
+
+          <div>
+            <h1>Remaining Results</h1>
+            <p>
+              Rankings from third place onward
+            </p>
+          </div>
+        </div>
+
+        <div class="pdf-date">
+          ${new Date().toLocaleString("en-GB")}
+        </div>
+      </div>
+
+      <div class="pdf-section-title">
+        Results Details
+        ${
+          remaining.length
+            ? `— ${remaining.length} remaining result${remaining.length === 1 ? "" : "s"}`
+            : ""
+        }
+      </div>
+
+      ${
+        chunk.length
+          ? `
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Activity</th>
+                  <th>Answered By</th>
+                  <th>Department</th>
+                  <th>Course</th>
+                  <th>Branch</th>
+                  <th>Period</th>
+                  <th>Winning Group</th>
+                  <th>Score</th>
+                  <th>%</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${chunk.map((item,index)=>{
+                  const realRank =
+                    3 +
+                    (
+                      pageIndex *
+                      rowsPerPage
+                    ) +
+                    index;
+
+                  return `
+                    <tr>
+                      <td>
+                        <b>${realRank}</b>
+                      </td>
+
+                      <td>
+                        ${esc(item.activityTitle || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(getParticipantName(item))}
+                      </td>
+
+                      <td>
+                        ${esc(
+                          getAnsweredTrainerDepartment(item)
+                        )}
+                      </td>
+
+                      <td>
+                        ${esc(item.courseName || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(item.branch || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(item.period || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(
+                          item.winningTeamName ||
+                          item.group ||
+                          "—"
+                        )}
+                      </td>
+
+                      <td>
+                        ${Number(item.score || 0)}
+                        /
+                        ${Number(item.total || 0)}
+                      </td>
+
+                      <td>
+                        ${Number(item.percent || 0)}%
+                      </td>
+
+                      <td>
+                        ${formatDate(item.createdAt)}
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          `
+          : `
+            <div class="pdf-empty-box">
+              There are no remaining results after the gold and silver winners.
+            </div>
+          `
+      }
+
+      <div class="pdf-footer">
+        Prudle Institute — Activities Results Report
+      </div>
+
+      <div class="pdf-page-number">
+        Page ${pageIndex + 2}
+      </div>
+    `;
+
+    await addDomPage(
+      page,
+      true
+    );
+  }
+
+  pdf.save(
+    "prudle-activities-results-professional.pdf"
+  );
+}
+
+window.addEventListener("DOMContentLoaded",loadResults);
+</script>
+
+</body>
+</html>
