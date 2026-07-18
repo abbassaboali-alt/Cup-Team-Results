@@ -292,8 +292,8 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-logo-img{
-  width:74px;
-  height:74px;
+  width:60px;
+  height:60px;
   object-fit:contain;
   border-radius:14px;
   background:#fff;
@@ -302,8 +302,8 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-header.compact{
-  padding:13px 18px;
-  border-radius:15px;
+  padding:9px 13px;
+  border-radius:12px;
 }
 
 .pdf-header.compact h1{
@@ -360,27 +360,29 @@ tbody tr:hover{background:#f8fbfd}
 .pdf-table{
   width:100%;
   border-collapse:collapse;
-  table-layout:fixed;
-  font-size:8px
+  table-layout:auto;
+  font-size:9.2px;
 }
 .pdf-table th{
   background:#164478;
   color:#fff;
-  padding:6px 3px;
+  padding:7px 4px;
   border:1px solid #dce6ef;
   line-height:1.15;
-  font-size:8px;
+  font-size:9px;
   overflow-wrap:anywhere;
   white-space:normal;
+  vertical-align:middle;
 }
 .pdf-table td{
   border:1px solid #dce6ef;
-  padding:5px 3px;
+  padding:6px 4px;
   text-align:center;
   overflow-wrap:anywhere;
-  word-break:break-word;
+  word-break:normal;
   line-height:1.2;
-  font-size:8px;
+  font-size:9px;
+  vertical-align:middle;
 }
 .pdf-table tr:nth-child(even){background:#f8fbfd}
 .pdf-footer{
@@ -399,7 +401,7 @@ tbody tr:hover{background:#f8fbfd}
   min-height:760px;
   background:#fff;
   color:#18324b;
-  padding:26px;
+  padding:14px;
   font-family:"Tajawal",Arial,sans-serif;
   overflow:hidden;
 }
@@ -506,8 +508,8 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-section-title{
-  margin:12px 0 9px;
-  padding:9px 12px;
+  margin:8px 0 6px;
+  padding:7px 10px;
   border-radius:12px;
   background:#edf4fa;
   color:#164478;
@@ -534,101 +536,27 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 
-.pdf-table.course-ranking th:nth-child(1),
-.pdf-table.course-ranking td:nth-child(1){width:5%}
 
-.pdf-table.course-ranking th:nth-child(2),
-.pdf-table.course-ranking td:nth-child(2){width:7%}
+/* Automatic column sizing according to content */
+.pdf-table th,
+.pdf-table td{
+  max-width:180px;
+}
 
-.pdf-table.course-ranking th:nth-child(3),
-.pdf-table.course-ranking td:nth-child(3){width:13%}
+.pdf-table th:first-child,
+.pdf-table td:first-child{
+  width:48px;
+  white-space:nowrap;
+}
 
-.pdf-table.course-ranking th:nth-child(4),
-.pdf-table.course-ranking td:nth-child(4){width:12%}
+.pdf-table th:nth-child(2),
+.pdf-table td:nth-child(2){
+  white-space:nowrap;
+}
 
-.pdf-table.course-ranking th:nth-child(5),
-.pdf-table.course-ranking td:nth-child(5){width:9%}
-
-.pdf-table.course-ranking th:nth-child(6),
-.pdf-table.course-ranking td:nth-child(6){width:10%}
-
-.pdf-table.course-ranking th:nth-child(7),
-.pdf-table.course-ranking td:nth-child(7){width:13%}
-
-.pdf-table.course-ranking th:nth-child(8),
-.pdf-table.course-ranking td:nth-child(8){width:7%}
-
-.pdf-table.course-ranking th:nth-child(9),
-.pdf-table.course-ranking td:nth-child(9){width:7%}
-
-.pdf-table.course-ranking th:nth-child(10),
-.pdf-table.course-ranking td:nth-child(10){width:8%}
-
-.pdf-table.course-ranking th:nth-child(11),
-.pdf-table.course-ranking td:nth-child(11){width:9%}
-
-.pdf-table.team-ranking th:nth-child(1),
-.pdf-table.team-ranking td:nth-child(1){width:6%}
-
-.pdf-table.team-ranking th:nth-child(2),
-.pdf-table.team-ranking td:nth-child(2){width:8%}
-
-.pdf-table.team-ranking th:nth-child(3),
-.pdf-table.team-ranking td:nth-child(3){width:11%}
-
-.pdf-table.team-ranking th:nth-child(4),
-.pdf-table.team-ranking td:nth-child(4){width:13%}
-
-.pdf-table.team-ranking th:nth-child(5),
-.pdf-table.team-ranking td:nth-child(5){width:13%}
-
-.pdf-table.team-ranking th:nth-child(6),
-.pdf-table.team-ranking td:nth-child(6){width:11%}
-
-.pdf-table.team-ranking th:nth-child(7),
-.pdf-table.team-ranking td:nth-child(7){width:8%}
-
-.pdf-table.team-ranking th:nth-child(8),
-.pdf-table.team-ranking td:nth-child(8){width:8%}
-
-.pdf-table.team-ranking th:nth-child(9),
-.pdf-table.team-ranking td:nth-child(9){width:9%}
-
-.pdf-table.team-ranking th:nth-child(10),
-.pdf-table.team-ranking td:nth-child(10){width:13%}
-
-.pdf-table.detail-ranking th:nth-child(1),
-.pdf-table.detail-ranking td:nth-child(1){width:5%}
-
-.pdf-table.detail-ranking th:nth-child(2),
-.pdf-table.detail-ranking td:nth-child(2){width:11%}
-
-.pdf-table.detail-ranking th:nth-child(3),
-.pdf-table.detail-ranking td:nth-child(3){width:10%}
-
-.pdf-table.detail-ranking th:nth-child(4),
-.pdf-table.detail-ranking td:nth-child(4){width:9%}
-
-.pdf-table.detail-ranking th:nth-child(5),
-.pdf-table.detail-ranking td:nth-child(5){width:10%}
-
-.pdf-table.detail-ranking th:nth-child(6),
-.pdf-table.detail-ranking td:nth-child(6){width:9%}
-
-.pdf-table.detail-ranking th:nth-child(7),
-.pdf-table.detail-ranking td:nth-child(7){width:13%}
-
-.pdf-table.detail-ranking th:nth-child(8),
-.pdf-table.detail-ranking td:nth-child(8){width:10%}
-
-.pdf-table.detail-ranking th:nth-child(9),
-.pdf-table.detail-ranking td:nth-child(9){width:8%}
-
-.pdf-table.detail-ranking th:nth-child(10),
-.pdf-table.detail-ranking td:nth-child(10){width:7%}
-
-.pdf-table.detail-ranking th:nth-child(11),
-.pdf-table.detail-ranking td:nth-child(11){width:8%}
+.pdf-table td b{
+  font-weight:900;
+}
 
 @media(max-width:1000px){
   .filters{grid-template-columns:repeat(3,1fr)}
@@ -2103,7 +2031,7 @@ async function exportProfessionalPDF(){
   const pageHeight =
     pdf.internal.pageSize.getHeight();
 
-  const margin = 7;
+  const margin = 2.5;
   const renderWidth = 1120;
 
   async function addDomPage(
@@ -2743,7 +2671,7 @@ async function exportProfessionalPDF(){
   const courseRanking =
     getCourseRanking();
 
-  const courseRowsPerPage = 10;
+  const courseRowsPerPage = 12;
 
   const courseChunks = [];
 
@@ -2890,7 +2818,7 @@ async function exportProfessionalPDF(){
   const teamRanking =
     getTeamRanking();
 
-  const teamRowsPerPage = 10;
+  const teamRowsPerPage = 12;
 
   const teamChunks = [];
 
@@ -3030,7 +2958,7 @@ async function exportProfessionalPDF(){
      FINAL PAGE(S) — ALL DETAILED RESULTS
   ========================================== */
 
-  const detailRowsPerPage = 10;
+  const detailRowsPerPage = 12;
 
   const detailChunks = [];
 
