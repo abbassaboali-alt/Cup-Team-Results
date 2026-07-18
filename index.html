@@ -361,26 +361,33 @@ tbody tr:hover{background:#f8fbfd}
   width:100%;
   border-collapse:collapse;
   table-layout:fixed;
-  font-size:10px
+  font-size:8px
 }
 .pdf-table th{
   background:#164478;
   color:#fff;
-  padding:8px 4px;
-  border:1px solid #dce6ef
+  padding:6px 3px;
+  border:1px solid #dce6ef;
+  line-height:1.15;
+  font-size:8px;
+  overflow-wrap:anywhere;
+  white-space:normal;
 }
 .pdf-table td{
   border:1px solid #dce6ef;
-  padding:7px 4px;
+  padding:5px 3px;
   text-align:center;
-  overflow-wrap:anywhere
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  line-height:1.2;
+  font-size:8px;
 }
 .pdf-table tr:nth-child(even){background:#f8fbfd}
 .pdf-footer{
-  margin-top:15px;
+  margin-top:9px;
   text-align:center;
   color:#6b7b8d;
-  font-size:11px
+  font-size:9px
 }
 
 /* Professional PDF pages */
@@ -392,8 +399,9 @@ tbody tr:hover{background:#f8fbfd}
   min-height:760px;
   background:#fff;
   color:#18324b;
-  padding:34px;
+  padding:26px;
   font-family:"Tajawal",Arial,sans-serif;
+  overflow:hidden;
 }
 
 .pdf-cover{
@@ -405,12 +413,12 @@ tbody tr:hover{background:#f8fbfd}
 
 .pdf-cover-title{
   text-align:center;
-  margin:14px 0 14px;
+  margin:10px 0 10px;
 }
 
 .pdf-cover-title h2{
   margin:0;
-  font-size:27px;
+  font-size:24px;
   color:#164478;
 }
 
@@ -424,15 +432,15 @@ tbody tr:hover{background:#f8fbfd}
 .pdf-podium{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:16px;
-  margin-top:10px;
+  gap:14px;
+  margin-top:8px;
 }
 
 .pdf-podium-card{
-  border-radius:20px;
-  padding:16px 18px;
+  border-radius:18px;
+  padding:13px 15px;
   text-align:center;
-  min-height:285px;
+  min-height:250px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -453,8 +461,8 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-podium-icon{
-  font-size:52px;
-  margin-bottom:5px;
+  font-size:42px;
+  margin-bottom:3px;
   line-height:1;
 }
 
@@ -478,32 +486,32 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-podium-name{
-  font-size:22px;
+  font-size:19px;
   font-weight:900;
   color:#164478;
-  margin:5px 0;
+  margin:4px 0;
 }
 
 .pdf-podium-meta{
-  font-size:12px;
-  line-height:1.65;
+  font-size:11px;
+  line-height:1.5;
   font-weight:700;
 }
 
 .pdf-podium-score{
-  font-size:25px;
+  font-size:22px;
   font-weight:900;
-  margin:7px 0 3px;
+  margin:5px 0 2px;
   color:#17a673;
 }
 
 .pdf-section-title{
-  margin:18px 0 12px;
-  padding:12px 15px;
-  border-radius:14px;
+  margin:12px 0 9px;
+  padding:9px 12px;
+  border-radius:12px;
   background:#edf4fa;
   color:#164478;
-  font-size:20px;
+  font-size:17px;
   font-weight:900;
 }
 
@@ -518,12 +526,109 @@ tbody tr:hover{background:#f8fbfd}
 }
 
 .pdf-page-number{
-  margin-top:12px;
+  margin-top:6px;
   text-align:right;
   color:#6b7b8d;
-  font-size:11px;
+  font-size:9px;
   font-weight:800;
 }
+
+
+.pdf-table.course-ranking th:nth-child(1),
+.pdf-table.course-ranking td:nth-child(1){width:5%}
+
+.pdf-table.course-ranking th:nth-child(2),
+.pdf-table.course-ranking td:nth-child(2){width:7%}
+
+.pdf-table.course-ranking th:nth-child(3),
+.pdf-table.course-ranking td:nth-child(3){width:13%}
+
+.pdf-table.course-ranking th:nth-child(4),
+.pdf-table.course-ranking td:nth-child(4){width:12%}
+
+.pdf-table.course-ranking th:nth-child(5),
+.pdf-table.course-ranking td:nth-child(5){width:9%}
+
+.pdf-table.course-ranking th:nth-child(6),
+.pdf-table.course-ranking td:nth-child(6){width:10%}
+
+.pdf-table.course-ranking th:nth-child(7),
+.pdf-table.course-ranking td:nth-child(7){width:13%}
+
+.pdf-table.course-ranking th:nth-child(8),
+.pdf-table.course-ranking td:nth-child(8){width:7%}
+
+.pdf-table.course-ranking th:nth-child(9),
+.pdf-table.course-ranking td:nth-child(9){width:7%}
+
+.pdf-table.course-ranking th:nth-child(10),
+.pdf-table.course-ranking td:nth-child(10){width:8%}
+
+.pdf-table.course-ranking th:nth-child(11),
+.pdf-table.course-ranking td:nth-child(11){width:9%}
+
+.pdf-table.team-ranking th:nth-child(1),
+.pdf-table.team-ranking td:nth-child(1){width:6%}
+
+.pdf-table.team-ranking th:nth-child(2),
+.pdf-table.team-ranking td:nth-child(2){width:8%}
+
+.pdf-table.team-ranking th:nth-child(3),
+.pdf-table.team-ranking td:nth-child(3){width:11%}
+
+.pdf-table.team-ranking th:nth-child(4),
+.pdf-table.team-ranking td:nth-child(4){width:13%}
+
+.pdf-table.team-ranking th:nth-child(5),
+.pdf-table.team-ranking td:nth-child(5){width:13%}
+
+.pdf-table.team-ranking th:nth-child(6),
+.pdf-table.team-ranking td:nth-child(6){width:11%}
+
+.pdf-table.team-ranking th:nth-child(7),
+.pdf-table.team-ranking td:nth-child(7){width:8%}
+
+.pdf-table.team-ranking th:nth-child(8),
+.pdf-table.team-ranking td:nth-child(8){width:8%}
+
+.pdf-table.team-ranking th:nth-child(9),
+.pdf-table.team-ranking td:nth-child(9){width:9%}
+
+.pdf-table.team-ranking th:nth-child(10),
+.pdf-table.team-ranking td:nth-child(10){width:13%}
+
+.pdf-table.detail-ranking th:nth-child(1),
+.pdf-table.detail-ranking td:nth-child(1){width:5%}
+
+.pdf-table.detail-ranking th:nth-child(2),
+.pdf-table.detail-ranking td:nth-child(2){width:11%}
+
+.pdf-table.detail-ranking th:nth-child(3),
+.pdf-table.detail-ranking td:nth-child(3){width:10%}
+
+.pdf-table.detail-ranking th:nth-child(4),
+.pdf-table.detail-ranking td:nth-child(4){width:9%}
+
+.pdf-table.detail-ranking th:nth-child(5),
+.pdf-table.detail-ranking td:nth-child(5){width:10%}
+
+.pdf-table.detail-ranking th:nth-child(6),
+.pdf-table.detail-ranking td:nth-child(6){width:9%}
+
+.pdf-table.detail-ranking th:nth-child(7),
+.pdf-table.detail-ranking td:nth-child(7){width:13%}
+
+.pdf-table.detail-ranking th:nth-child(8),
+.pdf-table.detail-ranking td:nth-child(8){width:10%}
+
+.pdf-table.detail-ranking th:nth-child(9),
+.pdf-table.detail-ranking td:nth-child(9){width:8%}
+
+.pdf-table.detail-ranking th:nth-child(10),
+.pdf-table.detail-ranking td:nth-child(10){width:7%}
+
+.pdf-table.detail-ranking th:nth-child(11),
+.pdf-table.detail-ranking td:nth-child(11){width:8%}
 
 @media(max-width:1000px){
   .filters{grid-template-columns:repeat(3,1fr)}
@@ -2031,16 +2136,31 @@ async function exportProfessionalPDF(){
         pdf.addPage();
       }
 
+      const maxHeight =
+        pageHeight - (margin * 2);
+
+      const scaleRatio =
+        Math.min(
+          1,
+          maxHeight / imgHeight
+        );
+
+      const finalWidth =
+        imgWidth * scaleRatio;
+
+      const finalHeight =
+        imgHeight * scaleRatio;
+
+      const x =
+        (pageWidth - finalWidth) / 2;
+
       pdf.addImage(
         imgData,
         "PNG",
+        x,
         margin,
-        margin,
-        imgWidth,
-        Math.min(
-          imgHeight,
-          pageHeight - (margin * 2)
-        ),
+        finalWidth,
+        finalHeight,
         undefined,
         "FAST"
       );
@@ -2562,10 +2682,10 @@ async function exportProfessionalPDF(){
     </div>
 
     <div class="pdf-cover-title">
-      <h2>Top Two Results</h2>
+      <h2>Top Performance Awards</h2>
 
       <p>
-        Gold and silver awards based on correct answers,
+        Professional ranking based on correct answers,
         percentage, and latest result when tied.
       </p>
     </div>
@@ -2623,7 +2743,7 @@ async function exportProfessionalPDF(){
   const courseRanking =
     getCourseRanking();
 
-  const courseRowsPerPage = 12;
+  const courseRowsPerPage = 10;
 
   const courseChunks = [];
 
@@ -2687,7 +2807,7 @@ async function exportProfessionalPDF(){
       ${
         chunk.length
           ? `
-            <table class="pdf-table">
+            <table class="pdf-table course-ranking">
               <thead>
                 <tr>
                   <th>Rank</th>
@@ -2770,7 +2890,7 @@ async function exportProfessionalPDF(){
   const teamRanking =
     getTeamRanking();
 
-  const teamRowsPerPage = 12;
+  const teamRowsPerPage = 10;
 
   const teamChunks = [];
 
@@ -2832,7 +2952,7 @@ async function exportProfessionalPDF(){
       ${
         chunk.length
           ? `
-            <table class="pdf-table">
+            <table class="pdf-table team-ranking">
               <thead>
                 <tr>
                   <th>Rank</th>
@@ -2910,7 +3030,7 @@ async function exportProfessionalPDF(){
      FINAL PAGE(S) — ALL DETAILED RESULTS
   ========================================== */
 
-  const detailRowsPerPage = 12;
+  const detailRowsPerPage = 10;
 
   const detailChunks = [];
 
@@ -2972,7 +3092,7 @@ async function exportProfessionalPDF(){
       ${
         chunk.length
           ? `
-            <table class="pdf-table">
+            <table class="pdf-table detail-ranking">
               <thead>
                 <tr>
                   <th>Rank</th>
