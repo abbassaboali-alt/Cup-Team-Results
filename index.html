@@ -870,10 +870,34 @@ tbody tr:hover{background:#f8fbfd}
     </div>
   </div>
 
+ <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+
   <div class="header-badge">
     <i class="fa-solid fa-chart-column"></i>
     Results Dashboard
   </div>
+
+  <button
+    type="button"
+    onclick="logout()"
+    style="
+      border:none;
+      background:#e74c3c;
+      color:#fff;
+      padding:10px 16px;
+      border-radius:999px;
+      font-weight:900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 5px 14px rgba(0,0,0,.18);
+    ">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    Logout
+  </button>
+
+</div>
 </header>
 
 <main class="container">
