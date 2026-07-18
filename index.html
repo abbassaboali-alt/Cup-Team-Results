@@ -2015,7 +2015,10 @@ async function exportProfessionalPDF(){
 
   const sorted = getSortedResults();
   const topTwo = sorted.slice(0,2);
+  const remaining = sorted.slice(2);
   const summary = getSummaryData();
+  const bestCourse = getBestCourseData();
+  const winningGroup = getWinningGroupData();
 
   const { jsPDF } = window.jspdf;
 
@@ -2111,482 +2114,139 @@ async function exportProfessionalPDF(){
     );
   }
 
-  function buildPodiumCard(
-    item,
-    rank
-  ){
-    const isGold =
-      rank === 1;
-
-    const cardClass =
-      isGold
-        ? "gold"
-        : "silver";
-
-    const icon =
-      isGold
-        ? "🏆"
-        : "🥈";
-
-    const label =
-      isGold
-        ? "1st Place — Gold"
-        : "2nd Place — Silver";
-
-    if(!item){
+  function getRankBadge(rank){
+    if(rank === 1){
       return `
-        <div class="pdf-podium-card ${cardClass}">
-          <div class="pdf-podium-icon">${icon}</div>
-          <div class="pdf-podium-rank">${label}</div>
-          <div class="pdf-podium-name">No Result</div>
-          <div class="pdf-podium-meta">
-            There is no second result for the selected filters.
-          </div>
-        </div>
+        <span style="
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          gap:6px;
+          min-width:82px;
+          padding:6px 10px;
+          border-radius:999px;
+          background:linear-gradient(135deg,#fff0a8,#f4b942);
+          color:#6d5100;
+          font-weight:900;
+        ">
+          🏆 Gold
+        </span>
+      `;
+    }
+
+    if(rank === 2){
+      return `
+        <span style="
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          gap:6px;
+          min-width:82px;
+          padding:6px 10px;
+          border-radius:999px;
+          background:linear-gradient(135deg,#f2f5f8,#c9d0d8);
+          color:#46515d;
+          font-weight:900;
+        ">
+          🥈 Silver
+        </span>
       `;
     }
 
     return `
-      <div class="pdf-podium-card ${cardClass}">
-        <div class="pdf-podium-icon">${icon}</div>
+      <span style="
+        display:inline-grid;
+        place-items:center;
+        width:30px;
+        height:30px;
+        border-radius:50%;
+        background:#edf4fa;
+        color:#164478;
+        font-weight:900;
+      ">
+        ${rank}
+      </span>
+    `;
+  }
 
-        <div class="pdf-podium-rank">
-          ${label}
-        </div>
+  function buildTopPerformanceCard(
+    type,
+    title,
+    name,
+    lines
+  ){
+    const isCourse =
+      type === "course";
 
-        <div class="pdf-podium-name">
-          ${esc(
-            item.winningTeamName ||
-            item.group ||
-            getParticipantName(item)
-          )}
+    const icon =
+      isCourse
+        ? "🏆"
+        : "🥇";
+
+    return `
+      <div style="
+        border:1px solid #dce6ef;
+        border-radius:22px;
+        padding:18px 20px;
+        min-height:280px;
+        text-align:center;
+        background:linear-gradient(180deg,#fffdf7,#ffffff);
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+      ">
+        <div style="
+          font-size:56px;
+          line-height:1;
+          margin-bottom:10px;
+        ">
+          ${icon}
         </div>
 
         <div style="
-          font-size:18px;
+          color:#164478;
+          font-size:20px;
           font-weight:900;
-          color:#18324b;
-          margin-bottom:8px;
+          margin-bottom:6px;
         ">
-          ${esc(item.courseName || "—")}
+          ${title}
         </div>
 
-        <div class="pdf-podium-score">
-          ${Number(item.score || 0)}
-          /
-          ${Number(item.total || 0)}
-          —
-          ${Number(item.percent || 0)}%
+        <div style="
+          color:#18324b;
+          font-size:24px;
+          font-weight:900;
+          margin-bottom:14px;
+        ">
+          ${esc(name || "—")}
         </div>
 
-        <div class="pdf-podium-meta">
-          <b>Activity:</b>
-          ${esc(item.activityTitle || "—")}
-          <br>
-
-          <b>Answered By:</b>
-          ${esc(getParticipantName(item))}
-          <br>
-
-          <b>Department:</b>
-          ${esc(
-            getAnsweredTrainerDepartment(item)
-          )}
-          <br>
-
-          <b>Branch:</b>
-          ${esc(item.branch || "—")}
-          <br>
-
-          <b>Period:</b>
-          ${esc(item.period || "—")}
-          <br>
-
-          <b>Date:</b>
-          ${formatDate(item.createdAt)}
+        <div style="
+          color:#6b7b8d;
+          font-size:14px;
+          line-height:1.85;
+          font-weight:700;
+        ">
+          ${lines}
         </div>
       </div>
     `;
   }
 
-  function getCourseRanking(){
-    const grouped = {};
-
-    FILTERED_RESULTS.forEach(item=>{
-      const key =
-        clean(item.courseId) ||
-        clean(item.courseName) ||
-        "unknown";
-
-      if(!grouped[key]){
-        grouped[key] = {
-          courseName:
-            item.courseName ||
-            "Unspecified Course",
-
-          trainerNames:[],
-          branches:[],
-          sections:[],
-          periods:[],
-          correct:0,
-          total:0,
-          attempts:0
-        };
-      }
-
-      grouped[key].correct +=
-        Number(item.score || 0);
-
-      grouped[key].total +=
-        Number(item.total || 0);
-
-      grouped[key].attempts++;
-
-      [
-        item.trainerName,
-        getParticipantName(item)
-      ].forEach(value=>{
-        value = clean(value);
-
-        if(
-          value &&
-          !grouped[key]
-            .trainerNames
-            .includes(value)
-        ){
-          grouped[key]
-            .trainerNames
-            .push(value);
-        }
-      });
-
-      [
-        item.branch
-      ].forEach(value=>{
-        value = clean(value);
-
-        if(
-          value &&
-          !grouped[key]
-            .branches
-            .includes(value)
-        ){
-          grouped[key]
-            .branches
-            .push(value);
-        }
-      });
-
-      [
-        getAnsweredTrainerDepartment(item)
-      ].forEach(value=>{
-        value = clean(value);
-
-        if(
-          value &&
-          !grouped[key]
-            .sections
-            .includes(value)
-        ){
-          grouped[key]
-            .sections
-            .push(value);
-        }
-      });
-
-      [
-        item.period
-      ].forEach(value=>{
-        value = clean(value);
-
-        if(
-          value &&
-          !grouped[key]
-            .periods
-            .includes(value)
-        ){
-          grouped[key]
-            .periods
-            .push(value);
-        }
-      });
-    });
-
-    return Object.values(grouped)
-      .map(item=>({
-        ...item,
-
-        trainer:
-          item.trainerNames.length
-            ? item.trainerNames.join(", ")
-            : "—",
-
-        branch:
-          item.branches.length
-            ? item.branches.join(", ")
-            : "—",
-
-        section:
-          item.sections.length
-            ? item.sections.join(", ")
-            : "—",
-
-        period:
-          item.periods.length
-            ? item.periods.join(", ")
-            : "—",
-
-        accuracy:item.total
-          ? Math.round(
-              (
-                item.correct /
-                item.total
-              ) * 100
-            )
-          : 0
-      }))
-      .sort((a,b)=>
-        b.correct -
-        a.correct ||
-
-        b.accuracy -
-        a.accuracy ||
-
-        b.attempts -
-        a.attempts
-      );
-  }
-
-  function getTeamRanking(){
-    const grouped = {};
-
-    FILTERED_RESULTS.forEach(item=>{
-      const teams =
-        Array.isArray(item.teams)
-          ? item.teams
-          : [];
-
-      if(teams.length){
-        teams.forEach(team=>{
-          const teamName =
-            clean(team.name) ||
-            (
-              clean(team.letter)
-                ? `Team ${clean(team.letter)}`
-                : "Unnamed Team"
-            );
-
-          const key =
-            clean(item.courseId) +
-            "||" +
-            clean(teamName);
-
-          if(!grouped[key]){
-            grouped[key] = {
-              teamName,
-              courseName:
-                item.courseName ||
-                "Unspecified Course",
-
-              trainerNames:[],
-              departments:[],
-              correct:0,
-              answered:0,
-              appearances:0
-            };
-          }
-
-          grouped[key].correct +=
-            Number(team.correct || 0);
-
-          grouped[key].answered +=
-            Number(
-              team.answered ||
-              team.assigned ||
-              0
-            );
-
-          grouped[key].appearances++;
-
-          const participant =
-            clean(getParticipantName(item));
-
-          if(
-            participant &&
-            !grouped[key]
-              .trainerNames
-              .includes(participant)
-          ){
-            grouped[key]
-              .trainerNames
-              .push(participant);
-          }
-
-          const department =
-            clean(
-              getAnsweredTrainerDepartment(item)
-            );
-
-          if(
-            department &&
-            !grouped[key]
-              .departments
-              .includes(department)
-          ){
-            grouped[key]
-              .departments
-              .push(department);
-          }
-        });
-
-        return;
-      }
-
-      const fallbackName =
-        clean(item.winningTeamName) ||
-        clean(item.group);
-
-      if(!fallbackName){
-        return;
-      }
-
-      const key =
-        clean(item.courseId) +
-        "||" +
-        fallbackName;
-
-      if(!grouped[key]){
-        grouped[key] = {
-          teamName:fallbackName,
-          courseName:
-            item.courseName ||
-            "Unspecified Course",
-
-          trainerNames:[],
-          departments:[],
-          correct:0,
-          answered:0,
-          appearances:0
-        };
-      }
-
-      grouped[key].correct +=
-        Number(
-          item.winningTeamCorrect ||
-          item.score ||
-          0
-        );
-
-      grouped[key].answered +=
-        Number(item.total || 0);
-
-      grouped[key].appearances++;
-
-      const participant =
-        clean(getParticipantName(item));
-
-      if(
-        participant &&
-        !grouped[key]
-          .trainerNames
-          .includes(participant)
-      ){
-        grouped[key]
-          .trainerNames
-          .push(participant);
-      }
-
-      const department =
-        clean(
-          getAnsweredTrainerDepartment(item)
-        );
-
-      if(
-        department &&
-        !grouped[key]
-          .departments
-          .includes(department)
-      ){
-        grouped[key]
-          .departments
-          .push(department);
-      }
-    });
-
-    return Object.values(grouped)
-      .map(item=>({
-        ...item,
-
-        trainer:
-          item.trainerNames.length
-            ? item.trainerNames.join(", ")
-            : "—",
-
-        department:
-          item.departments.length
-            ? item.departments.join(", ")
-            : "—",
-
-        accuracy:item.answered
-          ? Math.round(
-              (
-                item.correct /
-                item.answered
-              ) * 100
-            )
-          : 0
-      }))
-      .sort((a,b)=>
-        b.correct -
-        a.correct ||
-
-        b.accuracy -
-        a.accuracy ||
-
-        b.appearances -
-        a.appearances
-      );
-  }
-
-  function getRankAward(rank){
-    if(rank === 1){
-      return {
-        icon:"🏆",
-        label:"Gold"
-      };
-    }
-
-    if(rank === 2){
-      return {
-        icon:"🥈",
-        label:"Silver"
-      };
-    }
-
-    if(rank === 3){
-      return {
-        icon:"🥉",
-        label:"Bronze"
-      };
-    }
-
-    return {
-      icon:"",
-      label:"—"
-    };
-  }
-
   /* ==========================================
-     PAGE 1 — TOP TWO
+     PAGE 1 — MATCH SCREEN DESIGN
   ========================================== */
 
-  const cover =
+  const pageOne =
     document.createElement("div");
 
-  cover.className =
-    "pdf-page pdf-cover";
+  pageOne.className =
+    "pdf-page";
 
-  cover.innerHTML = `
+  pageOne.style.padding =
+    "18px";
+
+  pageOne.innerHTML = `
     <div class="pdf-header compact">
       <div class="pdf-brand compact">
         <img
@@ -2596,7 +2256,7 @@ async function exportProfessionalPDF(){
 
         <div>
           <h1>Prudle Activities Results</h1>
-          <p>Top Two Performance Awards</p>
+          <p>Top Performance and Results Details</p>
         </div>
       </div>
 
@@ -2605,53 +2265,193 @@ async function exportProfessionalPDF(){
       </div>
     </div>
 
-    <div class="pdf-filters">
+    <div class="pdf-filters" style="margin:10px 0">
       ${getFilterText()}
     </div>
 
-    <div class="pdf-cover-title">
-      <h2>Top Performance Awards</h2>
-
-      <p>
-        Professional ranking based on correct answers,
-        percentage, and latest result when tied.
-      </p>
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:9px;
+      color:#18324b;
+      font-size:22px;
+      font-weight:900;
+      margin:10px 0 12px;
+    ">
+      <span style="font-size:24px">🏆</span>
+      Top Performance
     </div>
 
-    <div class="pdf-podium">
-      ${buildPodiumCard(topTwo[0],1)}
-      ${buildPodiumCard(topTwo[1],2)}
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    ">
+      ${buildTopPerformanceCard(
+        "course",
+        "Winning Course",
+        bestCourse?.name || "—",
+        bestCourse
+          ? `
+            Answered By Trainer:
+            <b style="color:#17a673">
+              ${esc(bestCourse.answeredBy)}
+            </b><br>
+
+            Answered Trainer Department:
+            <b>${esc(bestCourse.department)}</b><br>
+
+            Correct Answers:
+            <b>${Number(bestCourse.totalCorrect || 0)}</b><br>
+
+            Total Questions:
+            <b>${Number(bestCourse.totalQuestions || 0)}</b><br>
+
+            Accuracy:
+            <b>${Number(bestCourse.accuracy || 0)}%</b><br>
+
+            Attempts:
+            <b>${Number(bestCourse.attempts || 0)}</b><br>
+
+            Branch:
+            <b>${esc(bestCourse.branch || "—")}</b><br>
+
+            <span style="
+              display:block;
+              margin-top:8px;
+              color:#17a673;
+              font-weight:900;
+            ">
+              This course is the winner because it has the highest number of correct answers.
+            </span>
+          `
+          : "No data available"
+      )}
+
+      ${buildTopPerformanceCard(
+        "team",
+        "Winning Group / Team",
+        winningGroup?.name || "—",
+        winningGroup
+          ? `
+            Winning Group:
+            <b>${esc(winningGroup.name)}</b><br>
+
+            Answered By Trainer:
+            <b style="color:#17a673">
+              ${esc(winningGroup.answeredBy)}
+            </b><br>
+
+            Answered Trainer Department:
+            <b>${esc(winningGroup.department)}</b><br>
+
+            Correct Answers:
+            <b>${Number(winningGroup.totalCorrect || 0)}</b><br>
+
+            Answered Questions:
+            <b>${Number(winningGroup.totalAnswered || 0)}</b><br>
+
+            Accuracy:
+            <b>${Number(winningGroup.accuracy || 0)}%</b><br>
+
+            Course:
+            <b>${esc(winningGroup.courseName || "—")}</b>
+          `
+          : "No data available"
+      )}
     </div>
 
-    <div class="pdf-stats" style="margin-top:14px">
-      <div class="pdf-stat">
-        Total Attempts
-        <b>${summary.total}</b>
-      </div>
-
-      <div class="pdf-stat">
-        Average
-        <b>${summary.average}%</b>
-      </div>
-
-      <div class="pdf-stat">
-        Highest Score
-        <b>${summary.highest}%</b>
-      </div>
-
-      <div class="pdf-stat">
-        Courses
-        <b>${summary.coursesCount}</b>
-      </div>
-
-      <div class="pdf-stat">
-        Activities
-        <b>${summary.activitiesCount}</b>
-      </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:9px;
+      color:#18324b;
+      font-size:22px;
+      font-weight:900;
+      margin:18px 0 10px;
+    ">
+      <span style="font-size:22px">▦</span>
+      Results Details
     </div>
+
+    <table class="pdf-table detail-ranking" style="font-size:9px">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Activity</th>
+          <th>Answered By Trainer</th>
+          <th>Trainer Department</th>
+          <th>Course</th>
+          <th>Branch</th>
+          <th>Period</th>
+          <th>Winning Group</th>
+          <th>Score</th>
+          <th>Percentage</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${topTwo.map((item,index)=>`
+          <tr>
+            <td>${getRankBadge(index + 1)}</td>
+
+            <td>
+              <b>${esc(item.activityTitle || "—")}</b>
+            </td>
+
+            <td>
+              <b>${esc(getParticipantName(item))}</b>
+            </td>
+
+            <td>
+              ${esc(
+                getAnsweredTrainerDepartment(item)
+              )}
+            </td>
+
+            <td>
+              ${esc(item.courseName || "—")}
+            </td>
+
+            <td>
+              ${esc(item.branch || "—")}
+            </td>
+
+            <td>
+              ${esc(item.period || "—")}
+            </td>
+
+            <td>
+              ${esc(
+                item.winningTeamName ||
+                item.group ||
+                "—"
+              )}
+            </td>
+
+            <td>
+              <b>
+                ${Number(item.score || 0)}
+                /
+                ${Number(item.total || 0)}
+              </b>
+            </td>
+
+            <td>
+              <b>${Number(item.percent || 0)}%</b>
+            </td>
+
+            <td>
+              ${formatDate(item.createdAt)}
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
 
     <div class="pdf-footer">
-      Prudle Institute — Professional Activities Results
+      Prudle Institute — Activities Results Report
     </div>
 
     <div class="pdf-page-number">
@@ -2660,53 +2460,50 @@ async function exportProfessionalPDF(){
   `;
 
   await addDomPage(
-    cover,
+    pageOne,
     false
   );
 
   /* ==========================================
-     PAGE 2+ — COURSE RANKING
+     PAGE 2+ — REMAINING COURSES / RESULTS
   ========================================== */
 
-  const courseRanking =
-    getCourseRanking();
+  const rowsPerPage = 12;
+  const chunks = [];
 
-  const courseRowsPerPage = 12;
-
-  const courseChunks = [];
-
-  for(
-    let i=0;
-    i<courseRanking.length;
-    i+=courseRowsPerPage
-  ){
-    courseChunks.push(
-      courseRanking.slice(
-        i,
-        i + courseRowsPerPage
-      )
-    );
+  if(remaining.length){
+    for(
+      let i=0;
+      i<remaining.length;
+      i+=rowsPerPage
+    ){
+      chunks.push(
+        remaining.slice(
+          i,
+          i + rowsPerPage
+        )
+      );
+    }
+  }else{
+    chunks.push([]);
   }
-
-  if(!courseChunks.length){
-    courseChunks.push([]);
-  }
-
-  let currentPdfPage = 2;
 
   for(
     let pageIndex=0;
-    pageIndex<courseChunks.length;
+    pageIndex<chunks.length;
     pageIndex++
   ){
     const chunk =
-      courseChunks[pageIndex];
+      chunks[pageIndex];
 
     const page =
       document.createElement("div");
 
     page.className =
       "pdf-page";
+
+    page.style.padding =
+      "14px";
 
     page.innerHTML = `
       <div class="pdf-header compact">
@@ -2717,8 +2514,10 @@ async function exportProfessionalPDF(){
             alt="Prudle Institute Logo">
 
           <div>
-            <h1>Course Ranking</h1>
-            <p>All courses ranked from first place onward</p>
+            <h1>Remaining Courses and Results</h1>
+            <p>
+              Rankings from third place onward
+            </p>
           </div>
         </div>
 
@@ -2728,311 +2527,26 @@ async function exportProfessionalPDF(){
       </div>
 
       <div class="pdf-section-title">
-        Course Ranking
-        — ${courseRanking.length} course${courseRanking.length === 1 ? "" : "s"}
+        Remaining Results
+        — ${remaining.length} record${remaining.length === 1 ? "" : "s"}
       </div>
 
       ${
         chunk.length
           ? `
-            <table class="pdf-table course-ranking">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Award</th>
-                  <th>Course</th>
-                  <th>Trainer</th>
-                  <th>Department</th>
-                  <th>Branch</th>
-                  <th>Period</th>
-                  <th>Correct</th>
-                  <th>Total</th>
-                  <th>Accuracy</th>
-                  <th>Attempts</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${chunk.map((item,index)=>{
-                  const rank =
-                    (
-                      pageIndex *
-                      courseRowsPerPage
-                    ) +
-                    index +
-                    1;
-
-                  const award =
-                    getRankAward(rank);
-
-                  return `
-                    <tr>
-                      <td><b>${rank}</b></td>
-                      <td>
-                        ${award.icon}
-                        ${award.label}
-                      </td>
-                      <td><b>${esc(item.courseName)}</b></td>
-                      <td>${esc(item.trainer)}</td>
-                      <td>${esc(item.section)}</td>
-                      <td>${esc(item.branch)}</td>
-                      <td>${esc(item.period)}</td>
-                      <td><b>${item.correct}</b></td>
-                      <td>${item.total}</td>
-                      <td><b>${item.accuracy}%</b></td>
-                      <td>${item.attempts}</td>
-                    </tr>
-                  `;
-                }).join("")}
-              </tbody>
-            </table>
-          `
-          : `
-            <div class="pdf-empty-box">
-              No course ranking is available.
-            </div>
-          `
-      }
-
-      <div class="pdf-footer">
-        Prudle Institute — Course Ranking
-      </div>
-
-      <div class="pdf-page-number">
-        Page ${currentPdfPage}
-      </div>
-    `;
-
-    await addDomPage(
-      page,
-      true
-    );
-
-    currentPdfPage++;
-  }
-
-  /* ==========================================
-     NEXT PAGE(S) — TEAM RANKING
-  ========================================== */
-
-  const teamRanking =
-    getTeamRanking();
-
-  const teamRowsPerPage = 12;
-
-  const teamChunks = [];
-
-  for(
-    let i=0;
-    i<teamRanking.length;
-    i+=teamRowsPerPage
-  ){
-    teamChunks.push(
-      teamRanking.slice(
-        i,
-        i + teamRowsPerPage
-      )
-    );
-  }
-
-  if(!teamChunks.length){
-    teamChunks.push([]);
-  }
-
-  for(
-    let pageIndex=0;
-    pageIndex<teamChunks.length;
-    pageIndex++
-  ){
-    const chunk =
-      teamChunks[pageIndex];
-
-    const page =
-      document.createElement("div");
-
-    page.className =
-      "pdf-page";
-
-    page.innerHTML = `
-      <div class="pdf-header compact">
-        <div class="pdf-brand compact">
-          <img
-            class="pdf-logo-img"
-            src="${document.querySelector('.pdf-logo-img')?.src || ''}"
-            alt="Prudle Institute Logo">
-
-          <div>
-            <h1>Team Ranking</h1>
-            <p>All groups ranked from first place onward</p>
-          </div>
-        </div>
-
-        <div class="pdf-date">
-          ${new Date().toLocaleString("en-GB")}
-        </div>
-      </div>
-
-      <div class="pdf-section-title">
-        Team Ranking
-        — ${teamRanking.length} team${teamRanking.length === 1 ? "" : "s"}
-      </div>
-
-      ${
-        chunk.length
-          ? `
-            <table class="pdf-table team-ranking">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Award</th>
-                  <th>Team</th>
-                  <th>Course</th>
-                  <th>Answered By</th>
-                  <th>Department</th>
-                  <th>Correct</th>
-                  <th>Answered</th>
-                  <th>Accuracy</th>
-                  <th>Appearances</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${chunk.map((item,index)=>{
-                  const rank =
-                    (
-                      pageIndex *
-                      teamRowsPerPage
-                    ) +
-                    index +
-                    1;
-
-                  const award =
-                    getRankAward(rank);
-
-                  return `
-                    <tr>
-                      <td><b>${rank}</b></td>
-                      <td>
-                        ${award.icon}
-                        ${award.label}
-                      </td>
-                      <td><b>${esc(item.teamName)}</b></td>
-                      <td>${esc(item.courseName)}</td>
-                      <td>${esc(item.trainer)}</td>
-                      <td>${esc(item.department)}</td>
-                      <td><b>${item.correct}</b></td>
-                      <td>${item.answered}</td>
-                      <td><b>${item.accuracy}%</b></td>
-                      <td>${item.appearances}</td>
-                    </tr>
-                  `;
-                }).join("")}
-              </tbody>
-            </table>
-          `
-          : `
-            <div class="pdf-empty-box">
-              No team ranking is available.
-            </div>
-          `
-      }
-
-      <div class="pdf-footer">
-        Prudle Institute — Team Ranking
-      </div>
-
-      <div class="pdf-page-number">
-        Page ${currentPdfPage}
-      </div>
-    `;
-
-    await addDomPage(
-      page,
-      true
-    );
-
-    currentPdfPage++;
-  }
-
-  /* ==========================================
-     FINAL PAGE(S) — ALL DETAILED RESULTS
-  ========================================== */
-
-  const detailRowsPerPage = 12;
-
-  const detailChunks = [];
-
-  for(
-    let i=0;
-    i<sorted.length;
-    i+=detailRowsPerPage
-  ){
-    detailChunks.push(
-      sorted.slice(
-        i,
-        i + detailRowsPerPage
-      )
-    );
-  }
-
-  if(!detailChunks.length){
-    detailChunks.push([]);
-  }
-
-  for(
-    let pageIndex=0;
-    pageIndex<detailChunks.length;
-    pageIndex++
-  ){
-    const chunk =
-      detailChunks[pageIndex];
-
-    const page =
-      document.createElement("div");
-
-    page.className =
-      "pdf-page";
-
-    page.innerHTML = `
-      <div class="pdf-header compact">
-        <div class="pdf-brand compact">
-          <img
-            class="pdf-logo-img"
-            src="${document.querySelector('.pdf-logo-img')?.src || ''}"
-            alt="Prudle Institute Logo">
-
-          <div>
-            <h1>Detailed Activity Results</h1>
-            <p>Complete results for all courses and teams</p>
-          </div>
-        </div>
-
-        <div class="pdf-date">
-          ${new Date().toLocaleString("en-GB")}
-        </div>
-      </div>
-
-      <div class="pdf-section-title">
-        Results Details
-        — ${sorted.length} result${sorted.length === 1 ? "" : "s"}
-      </div>
-
-      ${
-        chunk.length
-          ? `
-            <table class="pdf-table detail-ranking">
+            <table class="pdf-table detail-ranking" style="font-size:9px">
               <thead>
                 <tr>
                   <th>Rank</th>
                   <th>Activity</th>
-                  <th>Answered By</th>
-                  <th>Department</th>
+                  <th>Answered By Trainer</th>
+                  <th>Trainer Department</th>
                   <th>Course</th>
                   <th>Branch</th>
                   <th>Period</th>
                   <th>Winning Group</th>
                   <th>Score</th>
-                  <th>%</th>
+                  <th>Percentage</th>
                   <th>Date</th>
                 </tr>
               </thead>
@@ -3040,30 +2554,66 @@ async function exportProfessionalPDF(){
               <tbody>
                 ${chunk.map((item,index)=>{
                   const rank =
+                    3 +
                     (
                       pageIndex *
-                      detailRowsPerPage
+                      rowsPerPage
                     ) +
-                    index +
-                    1;
+                    index;
 
                   return `
                     <tr>
-                      <td><b>${rank}</b></td>
-                      <td>${esc(item.activityTitle || "—")}</td>
-                      <td>${esc(getParticipantName(item))}</td>
-                      <td>${esc(getAnsweredTrainerDepartment(item))}</td>
-                      <td>${esc(item.courseName || "—")}</td>
-                      <td>${esc(item.branch || "—")}</td>
-                      <td>${esc(item.period || "—")}</td>
-                      <td>${esc(item.winningTeamName || item.group || "—")}</td>
+                      <td>${getRankBadge(rank)}</td>
+
                       <td>
-                        ${Number(item.score || 0)}
-                        /
-                        ${Number(item.total || 0)}
+                        <b>${esc(item.activityTitle || "—")}</b>
                       </td>
-                      <td>${Number(item.percent || 0)}%</td>
-                      <td>${formatDate(item.createdAt)}</td>
+
+                      <td>
+                        <b>${esc(getParticipantName(item))}</b>
+                      </td>
+
+                      <td>
+                        ${esc(
+                          getAnsweredTrainerDepartment(item)
+                        )}
+                      </td>
+
+                      <td>
+                        ${esc(item.courseName || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(item.branch || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(item.period || "—")}
+                      </td>
+
+                      <td>
+                        ${esc(
+                          item.winningTeamName ||
+                          item.group ||
+                          "—"
+                        )}
+                      </td>
+
+                      <td>
+                        <b>
+                          ${Number(item.score || 0)}
+                          /
+                          ${Number(item.total || 0)}
+                        </b>
+                      </td>
+
+                      <td>
+                        <b>${Number(item.percent || 0)}%</b>
+                      </td>
+
+                      <td>
+                        ${formatDate(item.createdAt)}
+                      </td>
                     </tr>
                   `;
                 }).join("")}
@@ -3072,17 +2622,17 @@ async function exportProfessionalPDF(){
           `
           : `
             <div class="pdf-empty-box">
-              No detailed results are available.
+              There are no remaining results after the gold and silver results.
             </div>
           `
       }
 
       <div class="pdf-footer">
-        Prudle Institute — Detailed Activity Results
+        Prudle Institute — Remaining Activities Results
       </div>
 
       <div class="pdf-page-number">
-        Page ${currentPdfPage}
+        Page ${pageIndex + 2}
       </div>
     `;
 
@@ -3090,12 +2640,10 @@ async function exportProfessionalPDF(){
       page,
       true
     );
-
-    currentPdfPage++;
   }
 
   pdf.save(
-    "prudle-activities-full-professional-report.pdf"
+    "prudle-activities-results-screen-design.pdf"
   );
 }
 
