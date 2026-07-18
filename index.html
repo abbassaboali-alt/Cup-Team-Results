@@ -627,6 +627,235 @@ tbody tr:hover{background:#f8fbfd}
   .summary-grid{grid-template-columns:1fr}
   .panel{padding:15px}
 }
+
+
+/* =========================================
+   PROFESSIONAL A4 PORTRAIT PDF DESIGN
+========================================= */
+.portrait-pdf-page{
+  position:fixed;
+  left:-20000px;
+  top:0;
+  width:794px;
+  height:1123px;
+  overflow:hidden;
+  background:#fff;
+  color:#18324b;
+  padding:30px;
+  font-family:"Tajawal",Arial,sans-serif;
+}
+.portrait-cover-header,
+.portrait-inner-header{
+  min-height:116px;
+  padding:22px 24px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#10365f,#2467a5);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  box-shadow:0 16px 38px rgba(22,68,120,.22);
+}
+.portrait-cover-brand{display:flex;align-items:center;gap:16px}
+.portrait-logo-img,
+.portrait-logo-fallback{
+  width:72px;
+  height:72px;
+  border-radius:20px;
+  background:#fff;
+  object-fit:contain;
+  padding:7px;
+  box-shadow:0 7px 20px rgba(0,0,0,.17);
+}
+.portrait-logo-fallback{
+  display:grid;
+  place-items:center;
+  color:#164478;
+  font-size:33px;
+  font-weight:900;
+}
+.portrait-institute-name{
+  font-size:11px;
+  letter-spacing:2.2px;
+  font-weight:900;
+  opacity:.82;
+}
+.portrait-cover-brand h1{margin:4px 0 2px;font-size:28px;line-height:1.1}
+.portrait-cover-brand p{margin:0;font-size:12px;opacity:.82;font-weight:700}
+.portrait-report-date{
+  min-width:126px;
+  padding:12px 15px;
+  text-align:center;
+  border-radius:17px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.24);
+}
+.portrait-report-date span{display:block;font-size:9px;letter-spacing:1.5px;opacity:.75}
+.portrait-report-date b{display:block;font-size:16px;margin-top:5px}
+.portrait-report-date small{display:block;margin-top:2px;opacity:.8}
+.portrait-filter-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:14px 0;
+}
+.portrait-filter-card{
+  min-width:0;
+  border:1px solid #dce6ef;
+  border-radius:13px;
+  padding:8px 10px;
+  background:#f8fbfd;
+}
+.portrait-filter-card span{display:block;color:#6b7b8d;font-size:9px;font-weight:800}
+.portrait-filter-card b{
+  display:block;
+  color:#164478;
+  font-size:11px;
+  margin-top:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.portrait-section-heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin:14px 0 9px;
+  padding-bottom:7px;
+  border-bottom:2px solid #edf3f8;
+}
+.portrait-section-heading>div{display:flex;align-items:center;gap:9px}
+.portrait-section-heading span{
+  width:28px;height:28px;border-radius:9px;
+  display:grid;place-items:center;
+  background:#164478;color:#fff;font-size:11px;font-weight:900;
+}
+.portrait-section-heading h2{margin:0;color:#18324b;font-size:18px}
+.portrait-section-heading p{margin:0;color:#6b7b8d;font-size:10px;font-weight:700}
+.compact-heading{margin-top:12px}
+.portrait-stat-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.portrait-stat-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #dce6ef;
+  border-radius:15px;
+  padding:10px;
+  text-align:center;
+  background:#fff;
+}
+.portrait-stat-card:before{
+  content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:#2467a5;
+}
+.portrait-stat-card.green:before{background:#17a673}
+.portrait-stat-card.gold:before{background:#f4b942}
+.portrait-stat-card.red:before{background:#e74c3c}
+.portrait-stat-card span{display:block;color:#6b7b8d;font-size:9px;font-weight:800}
+.portrait-stat-card b{display:block;color:#164478;font-size:21px;margin-top:3px}
+.portrait-highlight-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+.portrait-highlight-card{
+  border:1px solid #ead28c;
+  border-radius:18px;
+  padding:12px 14px;
+  background:linear-gradient(145deg,#fffdf2,#ffffff);
+  position:relative;
+}
+.portrait-highlight-card.team{border-color:#cbd6e1;background:linear-gradient(145deg,#f8fbfd,#ffffff)}
+.portrait-highlight-icon{position:absolute;right:13px;top:11px;font-size:30px}
+.portrait-highlight-card>span{color:#6b7b8d;font-size:10px;font-weight:900}
+.portrait-highlight-card h3{margin:5px 42px 6px 0;color:#164478;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-highlight-details{font-size:10px;color:#6b7b8d}
+.portrait-highlight-details b{color:#17a673;font-size:15px}
+.portrait-highlight-details em{font-style:normal;margin-left:8px;color:#164478;font-weight:900}
+.portrait-highlight-card p{margin:5px 0 0;font-size:9px;color:#6b7b8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-winners-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.portrait-winner-card{
+  border-radius:19px;
+  padding:13px;
+  min-height:241px;
+  border:2px solid #dce6ef;
+  background:#fff;
+}
+.portrait-winner-card.gold{background:linear-gradient(145deg,#fff9d8,#fff);border-color:#efc34d}
+.portrait-winner-card.silver{background:linear-gradient(145deg,#f2f5f8,#fff);border-color:#bdc6d0}
+.portrait-winner-topline{display:flex;align-items:center;justify-content:space-between}
+.portrait-winner-medal{font-size:31px;line-height:1}
+.portrait-rank-label{font-size:9px;font-weight:900;letter-spacing:1.2px;color:#6b7b8d}
+.portrait-winner-name{font-size:18px;font-weight:900;color:#164478;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-winner-activity{font-size:10px;color:#6b7b8d;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-winner-score{font-size:17px;font-weight:900;color:#18324b;margin:8px 0}
+.portrait-winner-score span{float:right;padding:3px 8px;border-radius:999px;background:#e7f8f1;color:#17a673;font-size:13px}
+.portrait-winner-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.portrait-winner-grid>div{padding:6px 7px;border-radius:9px;background:rgba(255,255,255,.72);border:1px solid rgba(220,230,239,.85);min-width:0}
+.portrait-winner-grid span{display:block;color:#6b7b8d;font-size:8px;font-weight:800}
+.portrait-winner-grid b{display:block;color:#18324b;font-size:9px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-winner{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#6b7b8d}
+.portrait-pdf-footer{
+  position:absolute;
+  left:30px;right:30px;bottom:20px;
+  padding-top:8px;
+  border-top:1px solid #e4ebf1;
+  display:flex;justify-content:space-between;
+  color:#6b7b8d;font-size:9px;font-weight:800;
+}
+.small-brand .portrait-logo-img,
+.small-brand .portrait-logo-fallback{width:58px;height:58px;border-radius:16px;font-size:26px}
+.small-brand h1{font-size:23px}
+.portrait-page-counter{
+  width:72px;height:72px;border-radius:18px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.24);
+  font-size:9px;font-weight:900;letter-spacing:1px;
+}
+.portrait-page-counter b{display:block;font-size:25px;margin-top:-15px}
+.portrait-results-summary{display:grid;grid-template-columns:1fr 1fr 2fr;gap:9px;margin:14px 0 2px}
+.portrait-results-summary>div{border:1px solid #dce6ef;border-radius:14px;padding:9px 11px;background:#f8fbfd}
+.portrait-results-summary span{display:block;color:#6b7b8d;font-size:8px;font-weight:800}
+.portrait-results-summary b{display:block;color:#164478;font-size:14px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result-heading{margin-top:11px}
+.portrait-results-list{display:flex;flex-direction:column;gap:10px}
+.portrait-result-card{
+  display:grid;
+  grid-template-columns:66px 1fr;
+  border:1px solid #dce6ef;
+  border-radius:18px;
+  overflow:hidden;
+  min-height:145px;
+  background:#fff;
+  box-shadow:0 7px 18px rgba(31,70,102,.06);
+}
+.portrait-result-rank{
+  background:linear-gradient(180deg,#164478,#2467a5);
+  color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.portrait-result-rank span{font-size:8px;letter-spacing:1.1px;opacity:.76;font-weight:900}
+.portrait-result-rank b{font-size:27px;margin-top:3px}
+.portrait-result-main{padding:12px 14px}
+.portrait-result-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid #edf2f6}
+.portrait-result-course{color:#164478;font-size:15px;font-weight:900;max-width:455px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-result-activity{color:#6b7b8d;font-size:10px;font-weight:800;margin-top:2px}
+.portrait-result-score{text-align:right;min-width:80px}
+.portrait-result-score b{display:block;color:#17a673;font-size:20px}
+.portrait-result-score span{display:block;color:#6b7b8d;font-size:9px;font-weight:800}
+.portrait-result-details{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.portrait-result-details>div{min-width:0;padding:5px 7px;border-radius:8px;background:#f8fbfd}
+.portrait-result-details span{display:block;color:#6b7b8d;font-size:7.5px;font-weight:800}
+.portrait-result-details b{display:block;color:#18324b;font-size:9px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portrait-empty-state{
+  min-height:650px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;color:#6b7b8d;
+}
+.portrait-empty-state>div{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:#e8faf2;color:#17a673;font-size:32px;font-weight:900}
+.portrait-empty-state h3{margin:14px 0 4px;color:#164478;font-size:21px}
+.portrait-empty-state p{margin:0;font-size:11px}
 </style>
 </head>
 
@@ -2079,74 +2308,181 @@ async function exportProfessionalPDF(){
 
   const { jsPDF } = window.jspdf;
 
+  /* A4 PORTRAIT */
   const pdf = new jsPDF({
-    orientation:"landscape",
+    orientation:"portrait",
     unit:"mm",
     format:"a4"
   });
 
-  const pageWidth =
-    pdf.internal.pageSize.getWidth();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 6;
+  const renderWidth = 794;
 
-  const pageHeight =
-    pdf.internal.pageSize.getHeight();
+  function getParticipantName(item){
+    return (
+      item?.participantName ||
+      item?.participantUsername ||
+      item?.participantId ||
+      (item?.anonymous ? "Guest" : "—")
+    );
+  }
 
-  const margin = 2.5;
-  const renderWidth = 1120;
+  function getPdfLogoMarkup(){
+    const existing = document.querySelector("img[data-prudle-logo], .prudle-logo, #prudleLogo");
+    const src = existing?.src || "";
 
-  async function addDomPage(
-    element,
-    addNewPage=false
-  ){
+    if(src){
+      return `<img class="portrait-logo-img" src="${esc(src)}" alt="Prudle Institute Logo">`;
+    }
+
+    return `<div class="portrait-logo-fallback">P</div>`;
+  }
+
+  function getSelectedFilterCards(){
+    const filters = [
+      ["Activity Date","dateFilter"],
+      ["Branch","branchFilter"],
+      ["Department","sectionFilter"],
+      ["Trainer","trainerFilter"],
+      ["Course","courseFilter"],
+      ["Activity","activityFilter"],
+      ["Period","periodFilter"],
+      ["Answered By","participantFilter"]
+    ];
+
+    return filters.map(([label,id])=>{
+      const select = document.getElementById(id);
+      const value = select.value
+        ? select.options[select.selectedIndex].text
+        : "All";
+
+      return `
+        <div class="portrait-filter-card">
+          <span>${esc(label)}</span>
+          <b>${esc(value)}</b>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function buildWinnerCard(item,rank){
+    if(!item){
+      return `
+        <div class="portrait-winner-card empty-winner">
+          <div class="portrait-winner-medal">—</div>
+          <div class="portrait-winner-name">No result</div>
+        </div>
+      `;
+    }
+
+    const isGold = rank === 1;
+
+    return `
+      <div class="portrait-winner-card ${isGold ? "gold" : "silver"}">
+        <div class="portrait-winner-topline">
+          <div class="portrait-winner-medal">
+            ${isGold ? "🏆" : "🥈"}
+          </div>
+          <div class="portrait-rank-label">
+            ${isGold ? "GOLD WINNER" : "SILVER WINNER"}
+          </div>
+        </div>
+
+        <div class="portrait-winner-name">
+          ${esc(item.courseName || "Unspecified Course")}
+        </div>
+
+        <div class="portrait-winner-activity">
+          ${esc(item.activityTitle || "—")}
+        </div>
+
+        <div class="portrait-winner-score">
+          ${Number(item.score || 0)} / ${Number(item.total || 0)}
+          <span>${Number(item.percent || 0)}%</span>
+        </div>
+
+        <div class="portrait-winner-grid">
+          <div><span>Answered By</span><b>${esc(getParticipantName(item))}</b></div>
+          <div><span>Department</span><b>${esc(getAnsweredTrainerDepartment(item))}</b></div>
+          <div><span>Winning Group</span><b>${esc(item.winningTeamName || item.group || "—")}</b></div>
+          <div><span>Branch</span><b>${esc(item.branch || "—")}</b></div>
+          <div><span>Period</span><b>${esc(item.period || "—")}</b></div>
+          <div><span>Date</span><b>${esc(formatDate(item.createdAt))}</b></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function buildResultCard(item,rank){
+    return `
+      <div class="portrait-result-card">
+        <div class="portrait-result-rank">
+          <span>RANK</span>
+          <b>${rank}</b>
+        </div>
+
+        <div class="portrait-result-main">
+          <div class="portrait-result-title-row">
+            <div>
+              <div class="portrait-result-course">${esc(item.courseName || "—")}</div>
+              <div class="portrait-result-activity">${esc(item.activityTitle || "—")}</div>
+            </div>
+
+            <div class="portrait-result-score">
+              <b>${Number(item.percent || 0)}%</b>
+              <span>${Number(item.score || 0)} / ${Number(item.total || 0)}</span>
+            </div>
+          </div>
+
+          <div class="portrait-result-details">
+            <div><span>Answered By</span><b>${esc(getParticipantName(item))}</b></div>
+            <div><span>Department</span><b>${esc(getAnsweredTrainerDepartment(item))}</b></div>
+            <div><span>Branch</span><b>${esc(item.branch || "—")}</b></div>
+            <div><span>Period</span><b>${esc(item.period || "—")}</b></div>
+            <div><span>Winning Group</span><b>${esc(item.winningTeamName || item.group || "—")}</b></div>
+            <div><span>Date</span><b>${esc(formatDate(item.createdAt))}</b></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function addDomPage(element,addNewPage=false){
     document.body.appendChild(element);
 
     try{
-      const canvas =
-        await html2canvas(element,{
-          scale:2,
-          useCORS:true,
-          backgroundColor:"#ffffff",
-          windowWidth:renderWidth
-        });
+      await new Promise(resolve=>setTimeout(resolve,80));
 
-      const imgData =
-        canvas.toDataURL("image/png",1.0);
+      const canvas = await html2canvas(element,{
+        scale:2,
+        useCORS:true,
+        allowTaint:false,
+        backgroundColor:"#ffffff",
+        windowWidth:renderWidth,
+        logging:false
+      });
 
-      const imgWidth =
-        pageWidth - (margin * 2);
-
-      const imgHeight =
-        canvas.height *
-        imgWidth /
-        canvas.width;
+      const imgData = canvas.toDataURL("image/jpeg",0.96);
+      const availableWidth = pageWidth - (margin * 2);
+      const availableHeight = pageHeight - (margin * 2);
+      const naturalHeight = canvas.height * availableWidth / canvas.width;
+      const ratio = Math.min(1,availableHeight / naturalHeight);
+      const finalWidth = availableWidth * ratio;
+      const finalHeight = naturalHeight * ratio;
+      const x = (pageWidth - finalWidth) / 2;
+      const y = (pageHeight - finalHeight) / 2;
 
       if(addNewPage){
-        pdf.addPage();
+        pdf.addPage("a4","portrait");
       }
-
-      const maxHeight =
-        pageHeight - (margin * 2);
-
-      const scaleRatio =
-        Math.min(
-          1,
-          maxHeight / imgHeight
-        );
-
-      const finalWidth =
-        imgWidth * scaleRatio;
-
-      const finalHeight =
-        imgHeight * scaleRatio;
-
-      const x =
-        (pageWidth - finalWidth) / 2;
 
       pdf.addImage(
         imgData,
-        "PNG",
+        "JPEG",
         x,
-        margin,
+        y,
         finalWidth,
         finalHeight,
         undefined,
@@ -2158,550 +2494,173 @@ async function exportProfessionalPDF(){
     }
   }
 
-  function getParticipantName(item){
-    return (
-      item?.participantName ||
-      item?.participantUsername ||
-      item?.participantId ||
-      (
-        item?.anonymous
-          ? "Guest"
-          : "—"
-      )
-    );
-  }
-
-  function getRankBadge(rank){
-    if(rank === 1){
-      return `
-        <span style="
-          display:inline-flex;
-          align-items:center;
-          justify-content:center;
-          gap:6px;
-          min-width:82px;
-          padding:6px 10px;
-          border-radius:999px;
-          background:linear-gradient(135deg,#fff0a8,#f4b942);
-          color:#6d5100;
-          font-weight:900;
-        ">
-          🏆 Gold
-        </span>
-      `;
-    }
-
-    if(rank === 2){
-      return `
-        <span style="
-          display:inline-flex;
-          align-items:center;
-          justify-content:center;
-          gap:6px;
-          min-width:82px;
-          padding:6px 10px;
-          border-radius:999px;
-          background:linear-gradient(135deg,#f2f5f8,#c9d0d8);
-          color:#46515d;
-          font-weight:900;
-        ">
-          🥈 Silver
-        </span>
-      `;
-    }
-
-    return `
-      <span style="
-        display:inline-grid;
-        place-items:center;
-        width:30px;
-        height:30px;
-        border-radius:50%;
-        background:#edf4fa;
-        color:#164478;
-        font-weight:900;
-      ">
-        ${rank}
-      </span>
-    `;
-  }
-
-  function buildTopPerformanceCard(
-    type,
-    title,
-    name,
-    lines
-  ){
-    const isCourse =
-      type === "course";
-
-    const icon =
-      isCourse
-        ? "🏆"
-        : "🥇";
-
-    return `
-      <div style="
-        border:1px solid #dce6ef;
-        border-radius:22px;
-        padding:18px 20px;
-        min-height:280px;
-        text-align:center;
-        background:linear-gradient(180deg,#fffdf7,#ffffff);
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-      ">
-        <div style="
-          font-size:56px;
-          line-height:1;
-          margin-bottom:10px;
-        ">
-          ${icon}
-        </div>
-
-        <div style="
-          color:#164478;
-          font-size:20px;
-          font-weight:900;
-          margin-bottom:6px;
-        ">
-          ${title}
-        </div>
-
-        <div style="
-          color:#18324b;
-          font-size:24px;
-          font-weight:900;
-          margin-bottom:14px;
-        ">
-          ${esc(name || "—")}
-        </div>
-
-        <div style="
-          color:#6b7b8d;
-          font-size:14px;
-          line-height:1.85;
-          font-weight:700;
-        ">
-          ${lines}
-        </div>
-      </div>
-    `;
-  }
-
-  /* ==========================================
-     PAGE 1 — MATCH SCREEN DESIGN
-  ========================================== */
-
-  const pageOne =
-    document.createElement("div");
-
-  pageOne.className =
-    "pdf-page";
-
-  pageOne.style.padding =
-    "18px";
+  /* =============================
+     PAGE 1 — EXECUTIVE COVER
+  ============================== */
+  const pageOne = document.createElement("div");
+  pageOne.className = "portrait-pdf-page";
 
   pageOne.innerHTML = `
-    <div class="pdf-header compact">
-      <div class="pdf-brand compact">
-        <img
-          class="pdf-logo-img"
-          src="${document.querySelector('.pdf-logo-img')?.src || ''}"
-          alt="Prudle Institute Logo">
-
+    <div class="portrait-cover-header">
+      <div class="portrait-cover-brand">
+        ${getPdfLogoMarkup()}
         <div>
-          <h1>Prudle Activities Results</h1>
-          <p>Top Performance and Results Details</p>
+          <div class="portrait-institute-name">PRUDLE INSTITUTE</div>
+          <h1>Activities Results Report</h1>
+          <p>Professional Performance Summary</p>
         </div>
       </div>
 
-      <div class="pdf-date">
-        ${new Date().toLocaleString("en-GB")}
+      <div class="portrait-report-date">
+        <span>REPORT DATE</span>
+        <b>${esc(new Date().toLocaleDateString("en-GB"))}</b>
+        <small>${esc(new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))}</small>
       </div>
     </div>
 
-    <div class="pdf-filters" style="margin:10px 0">
-      ${getFilterText()}
+    <div class="portrait-filter-grid">
+      ${getSelectedFilterCards()}
     </div>
 
-    <div style="
-      display:flex;
-      align-items:center;
-      gap:9px;
-      color:#18324b;
-      font-size:22px;
-      font-weight:900;
-      margin:10px 0 12px;
-    ">
-      <span style="font-size:24px">🏆</span>
-      Top Performance
+    <div class="portrait-section-heading">
+      <div>
+        <span>01</span>
+        <h2>Performance Overview</h2>
+      </div>
+      <p>Summary based on the currently selected filters</p>
     </div>
 
-    <div style="
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    ">
-      ${buildTopPerformanceCard(
-        "course",
-        "Winning Course",
-        bestCourse?.name || "—",
-        bestCourse
-          ? `
-            Answered By Trainer:
-            <b style="color:#17a673">
-              ${esc(bestCourse.answeredBy)}
-            </b><br>
-
-            Answered Trainer Department:
-            <b>${esc(bestCourse.department)}</b><br>
-
-            Correct Answers:
-            <b>${Number(bestCourse.totalCorrect || 0)}</b><br>
-
-            Total Questions:
-            <b>${Number(bestCourse.totalQuestions || 0)}</b><br>
-
-            Accuracy:
-            <b>${Number(bestCourse.accuracy || 0)}%</b><br>
-
-            Attempts:
-            <b>${Number(bestCourse.attempts || 0)}</b><br>
-
-            Branch:
-            <b>${esc(bestCourse.branch || "—")}</b><br>
-
-            <span style="
-              display:block;
-              margin-top:8px;
-              color:#17a673;
-              font-weight:900;
-            ">
-              This course is the winner because it has the highest number of correct answers.
-            </span>
-          `
-          : "No data available"
-      )}
-
-      ${buildTopPerformanceCard(
-        "team",
-        "Winning Group / Team",
-        winningGroup?.name || "—",
-        winningGroup
-          ? `
-            Winning Group:
-            <b>${esc(winningGroup.name)}</b><br>
-
-            Answered By Trainer:
-            <b style="color:#17a673">
-              ${esc(winningGroup.answeredBy)}
-            </b><br>
-
-            Answered Trainer Department:
-            <b>${esc(winningGroup.department)}</b><br>
-
-            Correct Answers:
-            <b>${Number(winningGroup.totalCorrect || 0)}</b><br>
-
-            Answered Questions:
-            <b>${Number(winningGroup.totalAnswered || 0)}</b><br>
-
-            Accuracy:
-            <b>${Number(winningGroup.accuracy || 0)}%</b><br>
-
-            Course:
-            <b>${esc(winningGroup.courseName || "—")}</b>
-          `
-          : "No data available"
-      )}
+    <div class="portrait-stat-grid">
+      <div class="portrait-stat-card"><span>Total Attempts</span><b>${summary.total}</b></div>
+      <div class="portrait-stat-card green"><span>Average</span><b>${summary.average}%</b></div>
+      <div class="portrait-stat-card gold"><span>Highest Score</span><b>${summary.highest}%</b></div>
+      <div class="portrait-stat-card"><span>Courses</span><b>${summary.coursesCount}</b></div>
+      <div class="portrait-stat-card red"><span>Activities</span><b>${summary.activitiesCount}</b></div>
     </div>
 
-    <div style="
-      display:flex;
-      align-items:center;
-      gap:9px;
-      color:#18324b;
-      font-size:22px;
-      font-weight:900;
-      margin:18px 0 10px;
-    ">
-      <span style="font-size:22px">▦</span>
-      Results Details
+    <div class="portrait-highlight-grid">
+      <div class="portrait-highlight-card">
+        <div class="portrait-highlight-icon">🏆</div>
+        <span>Winning Course</span>
+        <h3>${esc(bestCourse?.name || "—")}</h3>
+        <div class="portrait-highlight-details">
+          <b>${Number(bestCourse?.totalCorrect || 0)}</b> correct answers
+          <em>${Number(bestCourse?.accuracy || 0)}% accuracy</em>
+        </div>
+        <p>${esc(bestCourse?.answeredBy || "No data available")}</p>
+      </div>
+
+      <div class="portrait-highlight-card team">
+        <div class="portrait-highlight-icon">🥇</div>
+        <span>Winning Group / Team</span>
+        <h3>${esc(winningGroup?.name || "—")}</h3>
+        <div class="portrait-highlight-details">
+          <b>${Number(winningGroup?.totalCorrect || 0)}</b> correct answers
+          <em>${Number(winningGroup?.accuracy || 0)}% accuracy</em>
+        </div>
+        <p>${esc(winningGroup?.courseName || "No data available")}</p>
+      </div>
     </div>
 
-    <table class="pdf-table detail-ranking" style="font-size:9px">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Activity</th>
-          <th>Answered By Trainer</th>
-          <th>Trainer Department</th>
-          <th>Course</th>
-          <th>Branch</th>
-          <th>Period</th>
-          <th>Winning Group</th>
-          <th>Score</th>
-          <th>Percentage</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        ${topTwo.map((item,index)=>`
-          <tr>
-            <td>${getRankBadge(index + 1)}</td>
-
-            <td>
-              <b>${esc(item.activityTitle || "—")}</b>
-            </td>
-
-            <td>
-              <b>${esc(getParticipantName(item))}</b>
-            </td>
-
-            <td>
-              ${esc(
-                getAnsweredTrainerDepartment(item)
-              )}
-            </td>
-
-            <td>
-              ${esc(item.courseName || "—")}
-            </td>
-
-            <td>
-              ${esc(item.branch || "—")}
-            </td>
-
-            <td>
-              ${esc(item.period || "—")}
-            </td>
-
-            <td>
-              ${esc(
-                item.winningTeamName ||
-                item.group ||
-                "—"
-              )}
-            </td>
-
-            <td>
-              <b>
-                ${Number(item.score || 0)}
-                /
-                ${Number(item.total || 0)}
-              </b>
-            </td>
-
-            <td>
-              <b>${Number(item.percent || 0)}%</b>
-            </td>
-
-            <td>
-              ${formatDate(item.createdAt)}
-            </td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-
-    <div class="pdf-footer">
-      Prudle Institute — Activities Results Report
+    <div class="portrait-section-heading compact-heading">
+      <div>
+        <span>02</span>
+        <h2>Gold and Silver Results</h2>
+      </div>
     </div>
 
-    <div class="pdf-page-number">
-      Page 1
+    <div class="portrait-winners-grid">
+      ${buildWinnerCard(topTwo[0],1)}
+      ${buildWinnerCard(topTwo[1],2)}
+    </div>
+
+    <div class="portrait-pdf-footer">
+      <span>Prudle Institute — Activities Results</span>
+      <b>Page 1</b>
     </div>
   `;
 
-  await addDomPage(
-    pageOne,
-    false
-  );
+  await addDomPage(pageOne,false);
 
-  /* ==========================================
-     PAGE 2+ — REMAINING COURSES / RESULTS
-  ========================================== */
-
-  const rowsPerPage = 12;
+  /* =============================
+     PAGE 2+ — REMAINING RESULTS
+  ============================== */
+  const rowsPerPage = 5;
   const chunks = [];
 
   if(remaining.length){
-    for(
-      let i=0;
-      i<remaining.length;
-      i+=rowsPerPage
-    ){
-      chunks.push(
-        remaining.slice(
-          i,
-          i + rowsPerPage
-        )
-      );
+    for(let i=0;i<remaining.length;i+=rowsPerPage){
+      chunks.push(remaining.slice(i,i + rowsPerPage));
     }
   }else{
     chunks.push([]);
   }
 
-  for(
-    let pageIndex=0;
-    pageIndex<chunks.length;
-    pageIndex++
-  ){
-    const chunk =
-      chunks[pageIndex];
-
-    const page =
-      document.createElement("div");
-
-    page.className =
-      "pdf-page";
-
-    page.style.padding =
-      "14px";
+  for(let pageIndex=0;pageIndex<chunks.length;pageIndex++){
+    const chunk = chunks[pageIndex];
+    const pageNumber = pageIndex + 2;
+    const page = document.createElement("div");
+    page.className = "portrait-pdf-page portrait-results-page";
 
     page.innerHTML = `
-      <div class="pdf-header compact">
-        <div class="pdf-brand compact">
-          <img
-            class="pdf-logo-img"
-            src="${document.querySelector('.pdf-logo-img')?.src || ''}"
-            alt="Prudle Institute Logo">
-
+      <div class="portrait-inner-header">
+        <div class="portrait-cover-brand small-brand">
+          ${getPdfLogoMarkup()}
           <div>
-            <h1>Remaining Courses and Results</h1>
-            <p>
-              Rankings from third place onward
-            </p>
+            <div class="portrait-institute-name">PRUDLE INSTITUTE</div>
+            <h1>Detailed Activity Results</h1>
+            <p>Rankings from third place onward</p>
           </div>
         </div>
 
-        <div class="pdf-date">
-          ${new Date().toLocaleString("en-GB")}
+        <div class="portrait-page-counter">
+          PAGE
+          <b>${pageNumber}</b>
         </div>
       </div>
 
-      <div class="pdf-section-title">
-        Remaining Results
-        — ${remaining.length} record${remaining.length === 1 ? "" : "s"}
+      <div class="portrait-results-summary">
+        <div><span>Total Remaining Results</span><b>${remaining.length}</b></div>
+        <div><span>Showing On This Page</span><b>${chunk.length}</b></div>
+        <div><span>Activity Date</span><b>${esc(document.getElementById("dateFilter").options[document.getElementById("dateFilter").selectedIndex]?.text || "—")}</b></div>
       </div>
 
-      ${
-        chunk.length
-          ? `
-            <table class="pdf-table detail-ranking" style="font-size:9px">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Activity</th>
-                  <th>Answered By Trainer</th>
-                  <th>Trainer Department</th>
-                  <th>Course</th>
-                  <th>Branch</th>
-                  <th>Period</th>
-                  <th>Winning Group</th>
-                  <th>Score</th>
-                  <th>Percentage</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
+      <div class="portrait-section-heading result-heading">
+        <div>
+          <span>${String(pageNumber).padStart(2,"0")}</span>
+          <h2>Remaining Results</h2>
+        </div>
+        <p>Complete details for every ranked record</p>
+      </div>
 
-              <tbody>
-                ${chunk.map((item,index)=>{
-                  const rank =
-                    3 +
-                    (
-                      pageIndex *
-                      rowsPerPage
-                    ) +
-                    index;
-
-                  return `
-                    <tr>
-                      <td>${getRankBadge(rank)}</td>
-
-                      <td>
-                        <b>${esc(item.activityTitle || "—")}</b>
-                      </td>
-
-                      <td>
-                        <b>${esc(getParticipantName(item))}</b>
-                      </td>
-
-                      <td>
-                        ${esc(
-                          getAnsweredTrainerDepartment(item)
-                        )}
-                      </td>
-
-                      <td>
-                        ${esc(item.courseName || "—")}
-                      </td>
-
-                      <td>
-                        ${esc(item.branch || "—")}
-                      </td>
-
-                      <td>
-                        ${esc(item.period || "—")}
-                      </td>
-
-                      <td>
-                        ${esc(
-                          item.winningTeamName ||
-                          item.group ||
-                          "—"
-                        )}
-                      </td>
-
-                      <td>
-                        <b>
-                          ${Number(item.score || 0)}
-                          /
-                          ${Number(item.total || 0)}
-                        </b>
-                      </td>
-
-                      <td>
-                        <b>${Number(item.percent || 0)}%</b>
-                      </td>
-
-                      <td>
-                        ${formatDate(item.createdAt)}
-                      </td>
-                    </tr>
-                  `;
-                }).join("")}
-              </tbody>
-            </table>
-          `
+      <div class="portrait-results-list">
+        ${chunk.length
+          ? chunk.map((item,index)=>
+              buildResultCard(
+                item,
+                3 + (pageIndex * rowsPerPage) + index
+              )
+            ).join("")
           : `
-            <div class="pdf-empty-box">
-              There are no remaining results after the gold and silver results.
+            <div class="portrait-empty-state">
+              <div>✓</div>
+              <h3>No Remaining Results</h3>
+              <p>Only the gold and silver results are available for the selected filters.</p>
             </div>
           `
-      }
-
-      <div class="pdf-footer">
-        Prudle Institute — Remaining Activities Results
+        }
       </div>
 
-      <div class="pdf-page-number">
-        Page ${pageIndex + 2}
+      <div class="portrait-pdf-footer">
+        <span>Prudle Institute — Detailed Activities Results</span>
+        <b>Page ${pageNumber}</b>
       </div>
     `;
 
-    await addDomPage(
-      page,
-      true
-    );
+    await addDomPage(page,true);
   }
 
-  pdf.save(
-    "prudle-activities-results-screen-design.pdf"
-  );
+  pdf.save("prudle-activities-results-portrait.pdf");
 }
 
 window.addEventListener("DOMContentLoaded",loadResults);
