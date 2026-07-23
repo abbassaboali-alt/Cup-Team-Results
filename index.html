@@ -920,38 +920,11 @@ tbody tr:hover{background:#f8fbfd}
 .empty-winner{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#6b7b8d}
 .portrait-pdf-footer{
   position:absolute;
-  left:0;
-  right:0;
-  .portrait-pdf-footer{
-  position:absolute;
-  left:40px;
-  right:40px;
-  bottom:0;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding-top:10px;
-  border-top:1px solid #e5e7eb;
-
-  font-size:13px;
-  font-weight:700;
-  color:#6b7280;
-}
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding:0 40px;
-
-  font-size:13px;
-  font-weight:700;
-  color:#6b7280;
-
-  border-top:1px solid #e5e7eb;
-  padding-top:10px;
+  left:30px;right:30px;bottom:20px;
+  padding-top:8px;
+  border-top:1px solid #e4ebf1;
+  display:flex;justify-content:space-between;
+  color:#6b7b8d;font-size:9px;font-weight:800;
 }
 .small-brand .portrait-logo-img,
 .small-brand .portrait-logo-fallback{width:58px;height:58px;border-radius:16px;font-size:26px}
@@ -3156,10 +3129,7 @@ async function exportProfessionalPDF(){
         }
       </div>
 
-      <div class="portrait-pdf-footer">
-        <span>Prudle Institute — Detailed Activities Results</span>
-        <b>Page ${pageNumber}</b>
-      </div>
+ 
     `;
 
     await addDomPage(page,true);
