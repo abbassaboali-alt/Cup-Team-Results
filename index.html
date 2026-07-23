@@ -79,7 +79,7 @@ button{cursor:pointer}
 
 .filters{
   display:grid;
-  grid-template-columns:repeat(8,minmax(150px,1fr));
+  grid-template-columns:repeat(9,minmax(150px,1fr));
   gap:12px
 }
 .field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}
@@ -959,7 +959,18 @@ tbody tr:hover{background:#f8fbfd}
       </div>
 
       <div class="field">
-        <label>Answered By</label>
+        <label>Solved By</label>
+        <select
+          id="solverTypeFilter"
+          onchange="updateParticipantOptions(); applyFilters()">
+          <option value="">All</option>
+          <option value="trainer">Trainer</option>
+          <option value="student">Student</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Student / Trainer Name</label>
         <select id="participantFilter" onchange="applyFilters()">
           <option value="">All</option>
         </select>
@@ -1286,6 +1297,169 @@ function fillSelect(id,values){
   }
 }
 
+
+function normalizeParticipantRole(item){
+  return clean(
+    item?.participantRole ||
+    item?.actorRole ||
+    item?.role ||
+    ""
+  ).toLowerCase();
+}
+
+function isStudentResult(item){
+
+  const role =
+    normalizeParticipantRole(item);
+
+  const type =
+    clean(
+      item?.participantType ||
+      ""
+    ).toLowerCase();
+
+  const iqama =
+    clean(
+      item?.studentIqama ||
+      item?.student_iqama ||
+      item?.iqama ||
+      ""
+    );
+
+  /*
+    A student result must be connected to an ID / Iqama
+    or explicitly saved as a student result.
+  */
+  return Boolean(
+    iqama ||
+    role === "student" ||
+    type === "student"
+  );
+}
+
+function isTrainerResult(item){
+
+  const role =
+    normalizeParticipantRole(item);
+
+  const username =
+    clean(
+      item?.participantUsername ||
+      item?.actorUsername ||
+      ""
+    );
+
+  /*
+    Supports both new records and older trainer records.
+  */
+  return Boolean(
+    role === "trainer" ||
+    role === "teacher" ||
+    (
+      !isStudentResult(item) &&
+      username &&
+      !role
+    )
+  );
+}
+
+function getParticipantDisplayName(item){
+
+  if(isStudentResult(item)){
+    return clean(
+      item?.studentName ||
+      item?.participantName ||
+      item?.participantUsername ||
+      item?.studentIqama ||
+      item?.studentId ||
+      item?.participantId ||
+      ""
+    );
+  }
+
+  return clean(
+    item?.participantName ||
+    item?.participantUsername ||
+    item?.actorName ||
+    item?.actorUsername ||
+    item?.participantId ||
+    ""
+  );
+}
+
+function matchesSolverType(item,type){
+
+  if(!type){
+    return true;
+  }
+
+  if(type === "student"){
+    return isStudentResult(item);
+  }
+
+  if(type === "trainer"){
+    return isTrainerResult(item);
+  }
+
+  return true;
+}
+
+function updateParticipantOptions(){
+
+  const typeSelect =
+    document.getElementById(
+      "solverTypeFilter"
+    );
+
+  const participantSelect =
+    document.getElementById(
+      "participantFilter"
+    );
+
+  if(!typeSelect || !participantSelect){
+    return;
+  }
+
+  const selectedType =
+    typeSelect.value;
+
+  const previousValue =
+    participantSelect.value;
+
+  const names = [
+    ...new Set(
+      ALL_RESULTS
+        .filter(item=>
+          matchesSolverType(
+            item,
+            selectedType
+          )
+        )
+        .map(item=>
+          getParticipantDisplayName(
+            item
+          )
+        )
+        .filter(Boolean)
+    )
+  ].sort((a,b)=>
+    a.localeCompare(b)
+  );
+
+  participantSelect.innerHTML =
+    `<option value="">All</option>` +
+    names.map(name=>`
+      <option value="${esc(name)}">
+        ${esc(name)}
+      </option>
+    `).join("");
+
+  participantSelect.value =
+    names.includes(previousValue)
+      ? previousValue
+      : "";
+}
+
 function fillFilters(){
 
   const dateSelect =
@@ -1350,29 +1524,7 @@ function fillFilters(){
   fillSelect("activityFilter",uniqueValues("activityTitle"));
   fillSelect("periodFilter",uniqueValues("period"));
 
-  const participants = [
-    ...new Set(
-      ALL_RESULTS
-        .map(item=>
-          clean(
-            item.participantName ||
-            item.participantUsername ||
-            item.participantId ||
-            (
-              item.anonymous
-                ? "Guest"
-                : ""
-            )
-          )
-        )
-        .filter(Boolean)
-    )
-  ].sort((a,b)=>a.localeCompare(b));
-
-  fillSelect(
-    "participantFilter",
-    participants
-  );
+  updateParticipantOptions();
 }
 
 async function loadResults(){
@@ -1456,16 +1608,20 @@ function applyFilters(){
       .getElementById("periodFilter")
       .value;
 
+  const solverType =
+    document
+      .getElementById("solverTypeFilter")
+      .value;
+
   const participant =
     document
       .getElementById("participantFilter")
       .value;
 
-
-  /* =====================================
-     يجب اختيار فلتر واحد على الأقل
-  ===================================== */
-
+  /*
+    Do not show results until at least one filter is selected.
+    The date is optional.
+  */
   const hasSelectedFilter =
     selectedDate ||
     branch ||
@@ -1474,6 +1630,7 @@ function applyFilters(){
     course ||
     activity ||
     period ||
+    solverType ||
     participant;
 
   if(!hasSelectedFilter){
@@ -1489,11 +1646,6 @@ function applyFilters(){
 
     return;
   }
-
-
-  /* =====================================
-     تطبيق الفلاتر المختارة فقط
-  ===================================== */
 
   FILTERED_RESULTS =
     ALL_RESULTS.filter(item=>
@@ -1547,31 +1699,26 @@ function applyFilters(){
         ) === period
       ) &&
 
+      matchesSolverType(
+        item,
+        solverType
+      ) &&
+
       (
         !participant ||
-
-        clean(
-          item.participantName ||
-          item.participantUsername ||
-          item.participantId ||
-          (
-            item.anonymous
-              ? "Guest"
-              : ""
-          )
+        getParticipantDisplayName(
+          item
         ) === participant
       )
-
     );
-
 
   renderSummary();
   renderLeaders();
   renderTable();
-
 }
 
 function resetFilters(){
+
   [
     "dateFilter",
     "branchFilter",
@@ -1580,11 +1727,19 @@ function resetFilters(){
     "courseFilter",
     "activityFilter",
     "periodFilter",
+    "solverTypeFilter",
     "participantFilter"
   ].forEach(id=>{
-    document.getElementById(id).value = "";
+
+    const element =
+      document.getElementById(id);
+
+    if(element){
+      element.value = "";
+    }
   });
 
+  updateParticipantOptions();
   applyFilters();
 }
 
@@ -2224,14 +2379,7 @@ function renderTable(emptyMessage="No results match the current filters."){
 
         <td>
           <b>${esc(
-            item.participantName ||
-            item.participantUsername ||
-            item.participantId ||
-            (
-              item.anonymous
-                ? "Guest"
-                : "—"
-            )
+            getParticipantDisplayName(item) || "—"
           )}</b>
         </td>
 
@@ -2405,10 +2553,7 @@ function exportCSV(){
 
   const rows = FILTERED_RESULTS.map(item=>[
     item.activityTitle || "",
-    item.participantName ||
-      item.participantUsername ||
-      item.participantId ||
-      (item.anonymous ? "Guest" : ""),
+    getParticipantDisplayName(item),
     getAnsweredTrainerDepartment(
       item
     ),
@@ -2458,7 +2603,8 @@ function getFilterText(){
     ["Course","courseFilter"],
     ["Activity","activityFilter"],
     ["Period","periodFilter"],
-    ["Answered By","participantFilter"]
+    ["Solved By","solverTypeFilter"],
+    ["Student / Trainer Name","participantFilter"]
   ];
 
   return items.map(([label,id])=>{
@@ -2527,7 +2673,8 @@ async function exportProfessionalPDF(){
       ["Course","courseFilter"],
       ["Activity","activityFilter"],
       ["Period","periodFilter"],
-      ["Answered By","participantFilter"]
+      ["Solved By","solverTypeFilter"],
+      ["Student / Trainer Name","participantFilter"]
     ];
 
     return filters.map(([label,id])=>{
