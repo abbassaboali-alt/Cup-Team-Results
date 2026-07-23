@@ -1426,12 +1426,35 @@ function applyFilters(){
       .getElementById("dateFilter")
       .value;
 
-  const branch = document.getElementById("branchFilter").value;
-  const section = document.getElementById("sectionFilter").value;
-  const trainer = document.getElementById("trainerFilter").value;
-  const course = document.getElementById("courseFilter").value;
-  const activity = document.getElementById("activityFilter").value;
-  const period = document.getElementById("periodFilter").value;
+  const branch =
+    document
+      .getElementById("branchFilter")
+      .value;
+
+  const section =
+    document
+      .getElementById("sectionFilter")
+      .value;
+
+  const trainer =
+    document
+      .getElementById("trainerFilter")
+      .value;
+
+  const course =
+    document
+      .getElementById("courseFilter")
+      .value;
+
+  const activity =
+    document
+      .getElementById("activityFilter")
+      .value;
+
+  const period =
+    document
+      .getElementById("periodFilter")
+      .value;
 
   const participant =
     document
@@ -1439,39 +1462,113 @@ function applyFilters(){
       .value;
 
 
+  /* =====================================
+     يجب اختيار فلتر واحد على الأقل
+  ===================================== */
 
-  FILTERED_RESULTS = ALL_RESULTS.filter(item=>
+  const hasSelectedFilter =
+    selectedDate ||
+    branch ||
+    section ||
+    trainer ||
+    course ||
+    activity ||
+    period ||
+    participant;
 
-  (!selectedDate ||
-    getDateKey(item.createdAt) === selectedDate) &&
+  if(!hasSelectedFilter){
 
-    (!branch || clean(item.branch) === branch) &&
-    (
-      !section ||
-      getAnsweredTrainerDepartment(item) === section
-    ) &&
-    (!trainer || clean(item.trainerName) === trainer) &&
-    (!course || clean(item.courseName) === course) &&
-    (!activity || clean(item.activityTitle) === activity) &&
-    (!period || clean(item.period) === period) &&
-    (
-      !participant ||
-      clean(
-        item.participantName ||
-        item.participantUsername ||
-        item.participantId ||
-        (
-          item.anonymous
-            ? "Guest"
-            : ""
-        )
-      ) === participant
-    )
-  );
+    FILTERED_RESULTS = [];
+
+    renderSummary();
+    renderLeaders();
+
+    renderTable(
+      "Select at least one filter to display the results."
+    );
+
+    return;
+  }
+
+
+  /* =====================================
+     تطبيق الفلاتر المختارة فقط
+  ===================================== */
+
+  FILTERED_RESULTS =
+    ALL_RESULTS.filter(item=>
+
+      (
+        !selectedDate ||
+        getDateKey(
+          item.createdAt
+        ) === selectedDate
+      ) &&
+
+      (
+        !branch ||
+        clean(
+          item.branch
+        ) === branch
+      ) &&
+
+      (
+        !section ||
+        getAnsweredTrainerDepartment(
+          item
+        ) === section
+      ) &&
+
+      (
+        !trainer ||
+        clean(
+          item.trainerName
+        ) === trainer
+      ) &&
+
+      (
+        !course ||
+        clean(
+          item.courseName
+        ) === course
+      ) &&
+
+      (
+        !activity ||
+        clean(
+          item.activityTitle
+        ) === activity
+      ) &&
+
+      (
+        !period ||
+        clean(
+          item.period
+        ) === period
+      ) &&
+
+      (
+        !participant ||
+
+        clean(
+          item.participantName ||
+          item.participantUsername ||
+          item.participantId ||
+          (
+            item.anonymous
+              ? "Guest"
+              : ""
+          )
+        ) === participant
+      )
+
+    );
+
 
   renderSummary();
   renderLeaders();
   renderTable();
+
 }
 
 function resetFilters(){
