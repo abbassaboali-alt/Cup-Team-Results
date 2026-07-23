@@ -1438,25 +1438,13 @@ function applyFilters(){
       .getElementById("participantFilter")
       .value;
 
-  /*
-    Results remain hidden until an activity date
-    is selected from the dropdown.
-  */
 
-  if(!selectedDate){
-    FILTERED_RESULTS = [];
-
-    renderSummary();
-    renderLeaders();
-    renderTable(
-      "Select an activity date from the filter above to display results."
-    );
-
-    return;
-  }
 
   FILTERED_RESULTS = ALL_RESULTS.filter(item=>
-    getDateKey(item.createdAt) === selectedDate &&
+
+  (!selectedDate ||
+    getDateKey(item.createdAt) === selectedDate) &&
+
     (!branch || clean(item.branch) === branch) &&
     (
       !section ||
