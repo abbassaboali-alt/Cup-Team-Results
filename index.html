@@ -1205,7 +1205,7 @@ select:focus{
 
       <div class="winner-card">
         <div class="winner-icon">🥇</div>
-        <h3>Winning Group / Team</h3>
+        <h3>Winning Group(s) / Team(s)</h3>
         <div id="winnerName" class="winner-name">—</div>
         <div id="winnerMeta" class="winner-meta">No data available</div>
       </div>
@@ -1229,7 +1229,7 @@ select:focus{
             <th>Course</th>
             <th>Branch</th>
             <th>Period</th>
-            <th>Winning Group</th>
+            <th>Winning Group(s)</th>
             <th>Score</th>
             <th>Percentage</th>
             <th>Date</th>
@@ -2108,25 +2108,126 @@ function getWinningTeamFromItem(item){
   return null;
 }
 
-function getWinningTeamName(item){
-  const savedName =
+/*
+  Returns all saved or calculated first-place team names.
+
+  New records save winningTeamNames directly.
+  Older records remain supported through winningTeamName,
+  group, or the complete teams array.
+*/
+function getWinningTeamNames(item){
+
+  const savedNames =
+    Array.isArray(item?.winningTeamNames)
+      ? item.winningTeamNames
+          .map(name=>clean(name))
+          .filter(Boolean)
+      : [];
+
+  if(savedNames.length){
+    return [...new Set(savedNames)];
+  }
+
+  const legacyName =
     clean(item?.winningTeamName) ||
     clean(item?.group);
 
-  if(savedName){
-    return savedName;
+  if(legacyName){
+    return [legacyName];
   }
 
-  const team = getWinningTeamFromItem(item);
+  const teams =
+    getSavedTeams(item);
 
-  if(!team){
-    return "";
+  if(!teams.length){
+    return [];
   }
 
-  return clean(team.name) ||
-    (clean(team.letter)
-      ? `Team ${clean(team.letter)}`
-      : "Unnamed Team");
+  const ranked =
+    [...teams]
+      .map(team=>({
+        ...team,
+        _correct:
+          getTeamCorrectValue(team),
+        _answered:
+          getTeamAnsweredValue(team),
+        _accuracy:
+          getTeamAnsweredValue(team)
+            ? Math.round(
+                (
+                  getTeamCorrectValue(team) /
+                  getTeamAnsweredValue(team)
+                ) * 100
+              )
+            : 0,
+        _racePosition:
+          Number(
+            team?.racePosition ||
+            0
+          )
+      }))
+      .sort((a,b)=>
+        b._racePosition -
+        a._racePosition ||
+
+        b._correct -
+        a._correct ||
+
+        b._accuracy -
+        a._accuracy ||
+
+        b._answered -
+        a._answered
+      );
+
+  const first =
+    ranked[0];
+
+  if(!first){
+    return [];
+  }
+
+  return ranked
+    .filter(team=>
+      team._racePosition ===
+        first._racePosition &&
+
+      team._correct ===
+        first._correct &&
+
+      team._accuracy ===
+        first._accuracy &&
+
+      team._answered ===
+        first._answered
+    )
+    .map(team=>
+      clean(team.name) ||
+      (
+        clean(team.letter)
+          ? `Team ${clean(team.letter)}`
+          : "Unnamed Team"
+      )
+    )
+    .filter(Boolean);
+}
+
+function getWinningTeamName(item){
+  return getWinningTeamNames(item)
+    .join(" & ");
+}
+
+function hasWinningTie(item){
+  return (
+    item?.isWinningTie === true ||
+    getWinningTeamNames(item).length > 1
+  );
+}
+
+function getWinningTeamLabel(item){
+  return hasWinningTie(item)
+    ? "Winning Groups"
+    : "Winning Group";
 }
 
 function getWinningGroupData(){
@@ -2323,39 +2424,111 @@ function getWinningGroupData(){
     }
   });
 
-  return Object.values(grouped)
-    .map(team=>({
-      ...team,
+  const ranked =
+    Object.values(grouped)
+      .map(team=>({
+        ...team,
 
-      accuracy:team.totalAnswered
-        ? Math.round(
-            (
-              team.totalCorrect /
-              team.totalAnswered
-            ) * 100
+        accuracy:team.totalAnswered
+          ? Math.round(
+              (
+                team.totalCorrect /
+                team.totalAnswered
+              ) * 100
+            )
+          : 0,
+
+        answeredBy:
+          team.answeredByNames?.length
+            ? team.answeredByNames.join(", ")
+            : "Not specified",
+
+        department:
+          team.departments?.length
+            ? team.departments.join(", ")
+            : "Not specified"
+      }))
+      .sort((a,b)=>
+        b.totalCorrect -
+        a.totalCorrect ||
+
+        b.accuracy -
+        a.accuracy ||
+
+        b.appearances -
+        a.appearances ||
+
+        a.name.localeCompare(b.name)
+      );
+
+  const first =
+    ranked[0];
+
+  if(!first){
+    return null;
+  }
+
+  const winners =
+    ranked.filter(team=>
+      team.totalCorrect ===
+        first.totalCorrect &&
+
+      team.accuracy ===
+        first.accuracy &&
+
+      team.appearances ===
+        first.appearances
+    );
+
+  const winnerNames =
+    winners.map(team=>team.name);
+
+  return {
+    ...first,
+
+    name:
+      winnerNames.join(" & "),
+
+    names:
+      winnerNames,
+
+    winners,
+
+    isTie:
+      winners.length > 1,
+
+    answeredBy:
+      [
+        ...new Set(
+          winners.flatMap(team=>
+            team.answeredByNames || []
           )
-        : 0,
+        )
+      ].join(", ") ||
+      first.answeredBy ||
+      "Not specified",
 
-      answeredBy:
-        team.answeredByNames?.length
-          ? team.answeredByNames.join(", ")
-          : "Not specified",
+    department:
+      [
+        ...new Set(
+          winners.flatMap(team=>
+            team.departments || []
+          )
+        )
+      ].join(", ") ||
+      first.department ||
+      "Not specified",
 
-      department:
-        team.departments?.length
-          ? team.departments.join(", ")
-          : "Not specified"
-    }))
-    .sort((a,b)=>
-      b.totalCorrect -
-      a.totalCorrect ||
-
-      b.accuracy -
-      a.accuracy ||
-
-      b.appearances -
-      a.appearances
-    )[0] || null;
+    courseName:
+      [
+        ...new Set(
+          winners
+            .map(team=>team.courseName)
+            .filter(Boolean)
+        )
+      ].join(", ") ||
+      first.courseName
+  };
 }
 
 function getWinnerData(){
@@ -2417,7 +2590,7 @@ function renderLeaders(){
     document
       .getElementById("winnerMeta")
       .textContent =
-        "No Team A, B, C, D, E, or F result is available for the selected filters.";
+        "No team result is available for the selected filters.";
 
     return;
   }
@@ -2430,7 +2603,11 @@ function renderLeaders(){
   document
     .getElementById("winnerMeta")
     .innerHTML =
-      `Winning Group: <b>${esc(winningGroup.name)}</b><br>` +
+      `${
+        winningGroup.isTie
+          ? "Winning Groups"
+          : "Winning Group"
+      }: <b>${esc(winningGroup.name)}</b><br>` +
       `Answered By Trainer: <b style="color:var(--green)">${esc(winningGroup.answeredBy)}</b><br>` +
       `Answered Trainer Department: <b>${esc(winningGroup.department)}</b><br>` +
       `Correct Answers: <b>${winningGroup.totalCorrect}</b><br>` +
@@ -2750,7 +2927,7 @@ function exportCSV(){
     "Course",
     "Branch",
     "Period",
-    "Winning Group",
+    "Winning Group(s)",
     "Winning Group Correct",
     "Score",
     "Total",
@@ -2936,7 +3113,7 @@ async function exportProfessionalPDF(){
         <div class="portrait-winner-grid">
           <div><span>Answered By</span><b>${esc(getParticipantName(item))}</b></div>
           <div><span>Department</span><b>${esc(getAnsweredTrainerDepartment(item))}</b></div>
-          <div><span>Winning Group</span><b>${esc(getWinningTeamName(item) || "—")}</b></div>
+          <div><span>${esc(getWinningTeamLabel(item))}</span><b>${esc(getWinningTeamName(item) || "—")}</b></div>
           <div><span>Branch</span><b>${esc(item.branch || "—")}</b></div>
           <div><span>Period</span><b>${esc(item.period || "—")}</b></div>
           <div><span>Date</span><b>${esc(formatDate(item.createdAt))}</b></div>
@@ -2971,7 +3148,7 @@ async function exportProfessionalPDF(){
             <div><span>Department</span><b>${esc(getAnsweredTrainerDepartment(item))}</b></div>
             <div><span>Branch</span><b>${esc(item.branch || "—")}</b></div>
             <div><span>Period</span><b>${esc(item.period || "—")}</b></div>
-            <div><span>Winning Group</span><b>${esc(getWinningTeamName(item) || "—")}</b></div>
+            <div><span>${esc(getWinningTeamLabel(item))}</span><b>${esc(getWinningTeamName(item) || "—")}</b></div>
             <div><span>Date</span><b>${esc(formatDate(item.createdAt))}</b></div>
           </div>
         </div>
@@ -3082,7 +3259,7 @@ async function exportProfessionalPDF(){
 
       <div class="portrait-highlight-card team">
         <div class="portrait-highlight-icon">🥇</div>
-        <span>Winning Group / Team</span>
+        <span>${winningGroup?.isTie ? "Winning Groups / Teams" : "Winning Group / Team"}</span>
         <h3>${esc(winningGroup?.name || "—")}</h3>
         <div class="portrait-highlight-details">
           <b>${Number(winningGroup?.totalCorrect || 0)}</b> correct answers
