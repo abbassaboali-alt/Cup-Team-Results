@@ -1035,6 +1035,32 @@ tbody tr:hover{background:#f8fbfd}
   color:#fff;
   font-size:19px;
 }
+
+.answer-review-head-actions{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+}
+.answer-review-pdf-btn{
+  min-height:42px;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:13px;
+  padding:10px 14px;
+  background:#e74c3c;
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:900;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+.answer-review-pdf-btn:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
 .answer-review-summary{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
@@ -1478,13 +1504,26 @@ select:focus{
         </p>
       </div>
 
-      <button
-        type="button"
-        class="answer-review-close"
-        onclick="closeAnswerReviewModal()"
-        aria-label="Close">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div class="answer-review-head-actions">
+
+        <button
+          id="answerReviewPdfBtn"
+          type="button"
+          class="answer-review-pdf-btn"
+          onclick="printCurrentAnswerReviewPDF()">
+          <i class="fa-solid fa-file-pdf"></i>
+          PDF
+        </button>
+
+        <button
+          type="button"
+          class="answer-review-close"
+          onclick="closeAnswerReviewModal()"
+          aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
     </div>
 
     <div
@@ -1583,6 +1622,7 @@ const RESULTS_COLLECTION = "FunActivityResults";
 
 let ALL_RESULTS = [];
 let FILTERED_RESULTS = [];
+let CURRENT_REVIEW_RESULT = null;
 
 /*
   Results pagination:
@@ -1935,7 +1975,7 @@ async function loadResults(){
 
   body.innerHTML = `
     <tr>
-      <td colspan="12" class="loading">
+      <td colspan="13" class="loading">
         <i class="fa-solid fa-spinner fa-spin"></i>
         Loading results...
       </td>
@@ -3017,6 +3057,8 @@ function openAnswerReview(resultId){
     return;
   }
 
+  CURRENT_REVIEW_RESULT = item;
+
   const modal =
     document.getElementById(
       "answerReviewModal"
@@ -3178,6 +3220,574 @@ function openAnswerReview(resultId){
   document.body.style.overflow = "hidden";
 }
 
+
+function buildAnswerReviewPdfPage(item){
+
+  const solverName =
+    getParticipantDisplayName(item) ||
+    clean(item.solvedByName) ||
+    "Not specified";
+
+  const solverLabel =
+    getSolverLabel(item);
+
+  const answers =
+    getSavedAnswerLog(item);
+
+  const correctCount =
+    answers.filter(answer=>
+      answer?.correct === true ||
+      answer?.isCorrect === true
+    ).length;
+
+  const wrongCount =
+    Math.max(
+      0,
+      answers.length - correctCount
+    );
+
+  const logoUrl =
+    "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+  const answerCards =
+    answers.length
+      ? answers.map((answer,index)=>{
+
+          const isCorrect =
+            answer?.correct === true ||
+            answer?.isCorrect === true;
+
+          const questionNumber =
+            Number(
+              answer?.questionNumber ||
+              index + 1
+            );
+
+          const questionText =
+            clean(
+              answer?.question ||
+              answer?.questionText ||
+              `Question ${questionNumber}`
+            );
+
+          const participantAnswer =
+            normalizeReviewValue(
+              answer?.studentAnswer ??
+              answer?.participantAnswer ??
+              answer?.selectedAnswer ??
+              answer?.answer ??
+              ""
+            ) || "No answer recorded";
+
+          const correctAnswer =
+            normalizeReviewValue(
+              answer?.correctAnswer ??
+              answer?.expectedAnswer ??
+              ""
+            ) || "Not available";
+
+          const questionType =
+            clean(
+              answer?.type ||
+              "Question"
+            );
+
+          return `
+            <section style="
+              margin-top:14px;
+              border:1px solid #dce6ef;
+              border-left:6px solid ${isCorrect ? "#17a673" : "#e74c3c"};
+              border-radius:15px;
+              overflow:hidden;
+              background:#fff;
+              page-break-inside:avoid;
+            ">
+              <div style="
+                padding:12px 14px;
+                background:#f8fbfd;
+                border-bottom:1px solid #e6edf3;
+              ">
+                <div style="
+                  display:flex;
+                  gap:7px;
+                  flex-wrap:wrap;
+                  margin-bottom:7px;
+                ">
+                  <span style="
+                    padding:5px 9px;
+                    border-radius:999px;
+                    background:#edf4fa;
+                    color:#164478;
+                    font-size:10px;
+                    font-weight:900;
+                  ">
+                    Question ${questionNumber}
+                  </span>
+
+                  <span style="
+                    padding:5px 9px;
+                    border-radius:999px;
+                    background:#edf4fa;
+                    color:#164478;
+                    font-size:10px;
+                    font-weight:900;
+                  ">
+                    ${esc(questionType)}
+                  </span>
+
+                  <span style="
+                    padding:5px 9px;
+                    border-radius:999px;
+                    background:${isCorrect ? "#e8faf2" : "#fff0ee"};
+                    color:${isCorrect ? "#08744f" : "#b42318"};
+                    font-size:10px;
+                    font-weight:900;
+                  ">
+                    ${isCorrect ? "Correct" : "Incorrect"}
+                  </span>
+                </div>
+
+                <div style="
+                  direction:ltr;
+                  text-align:left;
+                  color:#164478;
+                  font-size:15px;
+                  font-weight:900;
+                  line-height:1.7;
+                ">
+                  ${esc(questionText)}
+                </div>
+              </div>
+
+              <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:10px;
+                padding:12px 14px 14px;
+              ">
+                <div style="
+                  padding:11px;
+                  border:1px solid #dce6ef;
+                  border-radius:12px;
+                  background:#f8fbfd;
+                  direction:ltr;
+                  text-align:left;
+                ">
+                  <div style="
+                    margin-bottom:5px;
+                    color:#6b7b8d;
+                    font-size:9px;
+                    font-weight:900;
+                  ">
+                    ${esc(solverLabel)} Answer
+                  </div>
+
+                  <div style="
+                    color:#18324b;
+                    font-size:12px;
+                    font-weight:800;
+                    line-height:1.7;
+                    white-space:pre-wrap;
+                    overflow-wrap:anywhere;
+                  ">
+                    ${esc(participantAnswer)}
+                  </div>
+                </div>
+
+                <div style="
+                  padding:11px;
+                  border:1px solid #b9e8d4;
+                  border-radius:12px;
+                  background:#f0fbf6;
+                  direction:ltr;
+                  text-align:left;
+                ">
+                  <div style="
+                    margin-bottom:5px;
+                    color:#6b7b8d;
+                    font-size:9px;
+                    font-weight:900;
+                  ">
+                    Correct Answer
+                  </div>
+
+                  <div style="
+                    color:#18324b;
+                    font-size:12px;
+                    font-weight:800;
+                    line-height:1.7;
+                    white-space:pre-wrap;
+                    overflow-wrap:anywhere;
+                  ">
+                    ${esc(correctAnswer)}
+                  </div>
+                </div>
+              </div>
+            </section>
+          `;
+        }).join("")
+      : `
+          <div style="
+            margin-top:18px;
+            padding:32px;
+            border:1px dashed #b9cad9;
+            border-radius:15px;
+            text-align:center;
+            color:#6b7b8d;
+            font-weight:900;
+          ">
+            No question-by-question answers were saved for this attempt.
+          </div>
+        `;
+
+  const page =
+    document.createElement("div");
+
+  page.style.cssText = `
+    position:fixed;
+    left:-20000px;
+    top:0;
+    width:794px;
+    background:#ffffff;
+    color:#18324b;
+    padding:28px;
+    font-family:"Tajawal",Arial,sans-serif;
+  `;
+
+  page.innerHTML = `
+    <header style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 20px;
+      border-radius:20px;
+      background:linear-gradient(135deg,#10365f,#2467a5);
+      color:#fff;
+    ">
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:13px;
+      ">
+        <img
+          src="${logoUrl}"
+          crossorigin="anonymous"
+          style="
+            width:62px;
+            height:62px;
+            object-fit:contain;
+            border-radius:16px;
+            background:#fff;
+            padding:6px;
+          ">
+
+        <div>
+          <div style="
+            font-size:10px;
+            letter-spacing:1.5px;
+            font-weight:900;
+            opacity:.82;
+          ">
+            PRUDLE INSTITUTE
+          </div>
+
+          <h1 style="
+            margin:4px 0 2px;
+            font-size:25px;
+          ">
+            Activity Answer Report
+          </h1>
+
+          <div style="
+            font-size:11px;
+            opacity:.85;
+            font-weight:700;
+          ">
+            Student / Trainer Question Review
+          </div>
+        </div>
+      </div>
+
+      <div style="
+        min-width:126px;
+        padding:11px 13px;
+        border:1px solid rgba(255,255,255,.25);
+        border-radius:15px;
+        background:rgba(255,255,255,.12);
+        text-align:center;
+      ">
+        <div style="
+          font-size:9px;
+          opacity:.75;
+          font-weight:900;
+        ">
+          REPORT DATE
+        </div>
+
+        <div style="
+          margin-top:4px;
+          font-size:13px;
+          font-weight:900;
+        ">
+          ${esc(formatDate(item.createdAt))}
+        </div>
+      </div>
+    </header>
+
+    <section style="
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:9px;
+      margin-top:14px;
+    ">
+      ${[
+        ["Solved By", solverLabel],
+        ["Name", solverName],
+        ["Activity", item.activityTitle || "—"],
+        ["Course", item.courseName || "—"],
+        ["Trainer", item.trainerName || "—"],
+        ["Department", getAnsweredTrainerDepartment(item)],
+        ["Score", `${Number(item.score || 0)} / ${Number(item.total || 0)}`],
+        ["Percentage", `${Number(item.percent || 0)}%`],
+        ["Correct / Wrong", `${correctCount} / ${wrongCount}`]
+      ].map(([label,value])=>`
+        <div style="
+          min-width:0;
+          padding:10px 11px;
+          border:1px solid #dce6ef;
+          border-radius:12px;
+          background:#f8fbfd;
+        ">
+          <div style="
+            color:#6b7b8d;
+            font-size:9px;
+            font-weight:900;
+          ">
+            ${esc(label)}
+          </div>
+
+          <div style="
+            margin-top:4px;
+            color:#164478;
+            font-size:12px;
+            font-weight:900;
+            overflow-wrap:anywhere;
+          ">
+            ${esc(value)}
+          </div>
+        </div>
+      `).join("")}
+    </section>
+
+    <div style="
+      margin:17px 0 8px;
+      padding-bottom:7px;
+      border-bottom:2px solid #edf3f8;
+      color:#164478;
+      font-size:18px;
+      font-weight:900;
+    ">
+      Answer Details
+    </div>
+
+    ${answerCards}
+
+    <footer style="
+      margin-top:18px;
+      padding-top:8px;
+      border-top:1px solid #e4ebf1;
+      display:flex;
+      justify-content:space-between;
+      color:#6b7b8d;
+      font-size:9px;
+      font-weight:800;
+    ">
+      <span>Prudle Institute</span>
+      <span>Activity Answer Report</span>
+    </footer>
+  `;
+
+  document.body.appendChild(page);
+
+  return page;
+}
+
+
+async function printCurrentAnswerReviewPDF(){
+
+  const item =
+    CURRENT_REVIEW_RESULT;
+
+  if(!item){
+    alert(
+      "Open a result review before creating the PDF."
+    );
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "answerReviewPdfBtn"
+    );
+
+  if(button){
+    button.disabled = true;
+    button.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Creating PDF...
+    `;
+  }
+
+  let reportPage = null;
+
+  try{
+
+    reportPage =
+      buildAnswerReviewPdfPage(
+        item
+      );
+
+    await new Promise(resolve=>
+      setTimeout(resolve,350)
+    );
+
+    const canvas =
+      await html2canvas(
+        reportPage,
+        {
+          scale:2,
+          useCORS:true,
+          backgroundColor:"#ffffff",
+          logging:false,
+          windowWidth:794
+        }
+      );
+
+    const {
+      jsPDF
+    } = window.jspdf;
+
+    const pdf =
+      new jsPDF({
+        orientation:"portrait",
+        unit:"mm",
+        format:"a4"
+      });
+
+    const pageWidth =
+      pdf.internal.pageSize.getWidth();
+
+    const pageHeight =
+      pdf.internal.pageSize.getHeight();
+
+    const margin = 8;
+    const imageWidth =
+      pageWidth - margin * 2;
+
+    const imageHeight =
+      canvas.height *
+      imageWidth /
+      canvas.width;
+
+    const imageData =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.95
+      );
+
+    let heightLeft =
+      imageHeight;
+
+    let position =
+      margin;
+
+    pdf.addImage(
+      imageData,
+      "JPEG",
+      margin,
+      position,
+      imageWidth,
+      imageHeight
+    );
+
+    heightLeft -=
+      pageHeight - margin * 2;
+
+    while(heightLeft > 0){
+
+      pdf.addPage();
+
+      position =
+        margin -
+        (
+          imageHeight -
+          heightLeft
+        );
+
+      pdf.addImage(
+        imageData,
+        "JPEG",
+        margin,
+        position,
+        imageWidth,
+        imageHeight
+      );
+
+      heightLeft -=
+        pageHeight - margin * 2;
+    }
+
+    const solverName =
+      (
+        getParticipantDisplayName(item) ||
+        clean(item.solvedByName) ||
+        "Participant"
+      )
+      .replace(
+        /[\\/:*?"<>|]+/g,
+        "-"
+      );
+
+    const activityTitle =
+      clean(
+        item.activityTitle ||
+        "Activity"
+      )
+      .replace(
+        /[\\/:*?"<>|]+/g,
+        "-"
+      );
+
+    pdf.save(
+      `${solverName} - ${activityTitle} - Answer Report.pdf`
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Unable to create the answer report PDF."
+    );
+
+  }finally{
+
+    if(reportPage){
+      reportPage.remove();
+    }
+
+    if(button){
+      button.disabled = false;
+      button.innerHTML = `
+        <i class="fa-solid fa-file-pdf"></i>
+        PDF
+      `;
+    }
+  }
+}
+
+
 function closeAnswerReviewModal(event){
   if(
     event &&
@@ -3196,6 +3806,7 @@ function closeAnswerReviewModal(event){
     ?.classList
     .remove("show");
 
+  CURRENT_REVIEW_RESULT = null;
   document.body.style.overflow = "";
 }
 
