@@ -1619,6 +1619,8 @@ function logout(){
 
 })();
 const RESULTS_COLLECTION = "FunActivityResults";
+const ACTIVITIES_COLLECTION = "FunActivities";
+let CURRENT_ACTIVITIES_BY_ID = new Map();
 
 let ALL_RESULTS = [];
 let FILTERED_RESULTS = [];
@@ -1989,7 +1991,17 @@ async function loadResults(){
   `;
 
   try{
-    const snap = await db.collection(RESULTS_COLLECTION).get();
+    const [snap,activitiesSnap] = await Promise.all([
+      db.collection(RESULTS_COLLECTION).get(),
+      db.collection(ACTIVITIES_COLLECTION).get()
+    ]);
+
+    CURRENT_ACTIVITIES_BY_ID = new Map(
+      activitiesSnap.docs.map(doc=>[
+        doc.id,
+        {id:doc.id,...doc.data()}
+      ])
+    );
 
     ALL_RESULTS = snap.docs.map(doc=>({
       id:doc.id,
@@ -2989,6 +3001,103 @@ function renderPagination(total){
 }
 
 
+function formatCurrentCorrectAnswer(question){
+  const type = clean(question?.type || "mcq");
+  const answers = Array.isArray(question?.answers) ? question.answers : [];
+
+  if(type === "match"){
+    return answers.map(answer=>
+      `${answer?.text || ""} → ${answer?.right || answer?.image || ""}`
+    ).join(" | ");
+  }
+
+  if(type === "order"){
+    return answers
+      .map(answer=>answer?.text || "")
+      .filter(Boolean)
+      .join(" → ");
+  }
+
+  if(type === "wheel" || type === "random"){
+    return "Trainer evaluated answer";
+  }
+
+  return answers
+    .filter(answer=>answer?.correct === true)
+    .map(answer=>answer?.text || answer?.image || "")
+    .filter(Boolean)
+    .join(" | ");
+}
+
+function getCurrentActivityForResult(item){
+  const activityId = clean(item?.activityId || "");
+  return activityId
+    ? CURRENT_ACTIVITIES_BY_ID.get(activityId) || null
+    : null;
+}
+
+function mergeSavedAnswersWithCurrentQuestions(item,savedLog){
+  const activity = getCurrentActivityForResult(item);
+  const currentQuestions =
+    Array.isArray(activity?.questions)
+      ? activity.questions
+      : [];
+
+  if(!currentQuestions.length){
+    return savedLog;
+  }
+
+  return savedLog.map((answer,index)=>{
+    const savedQuestionId =
+      String(answer?.questionId || "");
+
+    const currentQuestion =
+      currentQuestions.find(question=>
+        savedQuestionId &&
+        String(question?.id || question?.questionId || "") === savedQuestionId
+      ) ||
+      currentQuestions[
+        Math.max(
+          0,
+          Number(answer?.questionNumber || index + 1) - 1
+        )
+      ];
+
+    if(!currentQuestion){
+      return answer;
+    }
+
+    return {
+      ...answer,
+      questionId:
+        currentQuestion.id ||
+        currentQuestion.questionId ||
+        savedQuestionId,
+      questionNumber:
+        Number(answer?.questionNumber || index + 1),
+      type:
+        currentQuestion.type ||
+        answer?.type ||
+        "Question",
+      question:
+        currentQuestion.text ||
+        answer?.question ||
+        answer?.questionText ||
+        "",
+      questionText:
+        currentQuestion.text ||
+        answer?.questionText ||
+        answer?.question ||
+        "",
+      correctAnswer:
+        formatCurrentCorrectAnswer(currentQuestion) ||
+        answer?.correctAnswer ||
+        answer?.expectedAnswer ||
+        ""
+    };
+  });
+}
+
 function getSavedAnswerLog(item){
   const possibleLogs = [
     item?.answerLog,
@@ -2999,7 +3108,7 @@ function getSavedAnswerLog(item){
 
   for(const log of possibleLogs){
     if(Array.isArray(log) && log.length){
-      return log;
+      return mergeSavedAnswersWithCurrentQuestions(item,log);
     }
   }
 
