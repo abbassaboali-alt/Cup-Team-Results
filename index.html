@@ -1809,9 +1809,13 @@ function isTrainerResult(item){
 function getParticipantDisplayName(item){
 
   if(isStudentResult(item)){
+
     return clean(
       item?.studentName ||
+      item?.studentFullName ||
       item?.participantName ||
+      item?.solvedByName ||
+      item?.displayName ||
       item?.participantUsername ||
       item?.studentIqama ||
       item?.studentId ||
@@ -1822,9 +1826,11 @@ function getParticipantDisplayName(item){
 
   return clean(
     item?.participantName ||
+    item?.solvedByName ||
     item?.participantUsername ||
     item?.actorName ||
     item?.actorUsername ||
+    item?.trainerName ||
     item?.participantId ||
     ""
   );
@@ -3001,11 +3007,27 @@ function getSavedAnswerLog(item){
 }
 
 function getSolverLabel(item){
-  if(isStudentResult(item)){
+
+  const selectedSolverType =
+    clean(
+      document
+        .getElementById("solverTypeFilter")
+        ?.value ||
+      ""
+    )
+    .toLowerCase();
+
+  if(
+    selectedSolverType === "student" ||
+    isStudentResult(item)
+  ){
     return "Student";
   }
 
-  if(isTrainerResult(item)){
+  if(
+    selectedSolverType === "trainer" ||
+    isTrainerResult(item)
+  ){
     return "Trainer";
   }
 
@@ -3224,16 +3246,78 @@ function openAnswerReview(resultId){
 
 function getReviewSolverName(item){
 
-  return (
-    getParticipantDisplayName(item) ||
-    clean(item.solvedByName) ||
-    clean(item.studentName) ||
-    clean(item.participantName) ||
-    clean(item.participantUsername) ||
-    clean(item.studentIqama) ||
-    clean(item.participantId) ||
-    "Not specified"
-  );
+  const selectedSolverType =
+    clean(
+      document
+        .getElementById("solverTypeFilter")
+        ?.value ||
+      ""
+    )
+    .toLowerCase();
+
+  /*
+    عند اختيار Student:
+    يعرض اسم الطالب الذي حل النشاط.
+  */
+  if(
+    selectedSolverType === "student" ||
+    isStudentResult(item)
+  ){
+
+    return clean(
+      item?.studentName ||
+      item?.studentFullName ||
+      item?.participantName ||
+      item?.solvedByName ||
+      item?.displayName ||
+      item?.participantUsername ||
+      item?.studentIqama ||
+      item?.studentId ||
+      item?.participantId ||
+      ""
+    ) || "Student";
+  }
+
+  /*
+    عند اختيار Trainer:
+    يعرض اسم المدرب الذي حل النشاط.
+  */
+  if(
+    selectedSolverType === "trainer" ||
+    isTrainerResult(item)
+  ){
+
+    return clean(
+      item?.participantName ||
+      item?.solvedByName ||
+      item?.participantUsername ||
+      item?.actorName ||
+      item?.actorUsername ||
+      item?.trainerName ||
+      item?.participantId ||
+      ""
+    ) || "Trainer";
+  }
+
+  /*
+    عند اختيار All:
+    يحدد الاسم تلقائيًا حسب نوع النتيجة.
+  */
+  return clean(
+    item?.studentName ||
+    item?.studentFullName ||
+    item?.participantName ||
+    item?.solvedByName ||
+    item?.displayName ||
+    item?.participantUsername ||
+    item?.actorName ||
+    item?.actorUsername ||
+    item?.trainerName ||
+    item?.studentIqama ||
+    item?.studentId ||
+    item?.participantId ||
+    ""
+  ) || "Not specified";
 }
 
 
