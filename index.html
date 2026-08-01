@@ -980,6 +980,210 @@ tbody tr:hover{background:#f8fbfd}
 .portrait-empty-state h3{margin:14px 0 4px;color:#164478;font-size:21px}
 .portrait-empty-state p{margin:0;font-size:11px}
 
+
+/* =========================================
+   ANSWERS REVIEW MODAL
+========================================= */
+.answer-review-modal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(15,31,48,.72);
+  backdrop-filter:blur(6px);
+}
+.answer-review-modal.show{display:flex}
+.answer-review-dialog{
+  width:min(1050px,97vw);
+  max-height:92vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 28px 80px rgba(0,0,0,.35);
+}
+.answer-review-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:15px;
+  padding:19px 22px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+}
+.answer-review-head h2{
+  margin:0;
+  font-size:22px;
+}
+.answer-review-head p{
+  margin:5px 0 0;
+  opacity:.88;
+  font-size:13px;
+  font-weight:700;
+}
+.answer-review-close{
+  width:42px;
+  height:42px;
+  flex:0 0 auto;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:13px;
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  font-size:19px;
+}
+.answer-review-summary{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+  padding:14px 18px;
+  border-bottom:1px solid #e5edf4;
+  background:#f8fbfd;
+}
+.answer-review-summary-item{
+  min-width:0;
+  padding:10px;
+  border:1px solid #dce6ef;
+  border-radius:13px;
+  background:#fff;
+}
+.answer-review-summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+}
+.answer-review-summary-item b{
+  display:block;
+  margin-top:4px;
+  color:var(--blue);
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+.answer-review-body{
+  overflow:auto;
+  padding:18px;
+  background:#f5f8fb;
+}
+.answer-review-empty{
+  padding:42px 15px;
+  border:1px dashed #b9cad9;
+  border-radius:17px;
+  background:#fff;
+  color:var(--muted);
+  text-align:center;
+  font-weight:900;
+}
+.answer-review-list{
+  display:grid;
+  gap:12px;
+}
+.answer-review-card{
+  overflow:hidden;
+  border:1px solid #dce6ef;
+  border-left:6px solid var(--red);
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(31,70,102,.05);
+}
+.answer-review-card.correct{
+  border-left-color:var(--green);
+}
+.answer-review-question{
+  padding:13px 15px;
+  border-bottom:1px solid #edf2f6;
+  color:var(--blue);
+  font-size:15px;
+  font-weight:900;
+  line-height:1.7;
+  direction:ltr;
+  text-align:left;
+}
+.answer-review-question-meta{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-bottom:7px;
+}
+.answer-review-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#edf4fa;
+  color:var(--blue);
+  font-size:10px;
+  font-weight:900;
+}
+.answer-review-chip.correct{
+  background:#e8faf2;
+  color:#08744f;
+}
+.answer-review-chip.wrong{
+  background:#fff0ee;
+  color:#b42318;
+}
+.answer-review-values{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:13px 15px 15px;
+}
+.answer-review-value{
+  min-width:0;
+  padding:12px;
+  border:1px solid #dce6ef;
+  border-radius:13px;
+  background:#f8fbfd;
+  direction:ltr;
+  text-align:left;
+  overflow-wrap:anywhere;
+}
+.answer-review-value.correct-value{
+  background:#f0fbf6;
+  border-color:#b9e8d4;
+}
+.answer-review-value span{
+  display:block;
+  margin-bottom:5px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.answer-review-value b{
+  color:var(--text);
+  font-size:13px;
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+.btn-review{
+  background:#8b5cf6;
+  color:#fff;
+}
+.result-actions-cell{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+@media(max-width:760px){
+  .answer-review-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .answer-review-values{
+    grid-template-columns:1fr;
+  }
+  .answer-review-dialog{
+    max-height:95vh;
+  }
+}
+
 /* =========================================
    FILTER PANEL RESPONSIVE CONTAINMENT FIX
 ========================================= */
@@ -1233,13 +1437,14 @@ select:focus{
             <th>Score</th>
             <th>Percentage</th>
             <th>Date</th>
+            <th>Review Answers</th>
             <th>Delete</th>
           </tr>
         </thead>
 
         <tbody id="resultsBody">
           <tr>
-            <td colspan="12" class="loading">
+            <td colspan="13" class="loading">
               Loading results...
             </td>
           </tr>
@@ -1251,6 +1456,51 @@ select:focus{
   </section>
 
 </main>
+
+
+<div
+  id="answerReviewModal"
+  class="answer-review-modal"
+  onclick="closeAnswerReviewModal(event)">
+
+  <div
+    class="answer-review-dialog"
+    onclick="event.stopPropagation()">
+
+    <div class="answer-review-head">
+      <div>
+        <h2>
+          <i class="fa-solid fa-clipboard-check"></i>
+          Answer Review
+        </h2>
+        <p id="answerReviewSubtitle">
+          Student or trainer answers
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="answer-review-close"
+        onclick="closeAnswerReviewModal()"
+        aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div
+      id="answerReviewSummary"
+      class="answer-review-summary">
+    </div>
+
+    <div class="answer-review-body">
+      <div
+        id="answerReviewContent"
+        class="answer-review-list">
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
 firebase.initializeApp({
@@ -1714,7 +1964,7 @@ async function loadResults(){
 
     body.innerHTML = `
       <tr>
-        <td colspan="12" class="empty" style="color:var(--red)">
+        <td colspan="13" class="empty" style="color:var(--red)">
           Unable to load activity results.
         </td>
       </tr>
@@ -2692,6 +2942,273 @@ function renderPagination(total){
   `;
 }
 
+
+function getSavedAnswerLog(item){
+  const possibleLogs = [
+    item?.answerLog,
+    item?.studentAnswers,
+    item?.answersReview,
+    item?.questionAnswers
+  ];
+
+  for(const log of possibleLogs){
+    if(Array.isArray(log) && log.length){
+      return log;
+    }
+  }
+
+  return [];
+}
+
+function getSolverLabel(item){
+  if(isStudentResult(item)){
+    return "Student";
+  }
+
+  if(isTrainerResult(item)){
+    return "Trainer";
+  }
+
+  return clean(
+    item?.solvedByRole ||
+    item?.participantRole ||
+    "Participant"
+  );
+}
+
+function normalizeReviewValue(value){
+  if(value === null || value === undefined){
+    return "";
+  }
+
+  if(Array.isArray(value)){
+    return value
+      .map(item=>
+        typeof item === "object"
+          ? JSON.stringify(item)
+          : String(item)
+      )
+      .join(" | ");
+  }
+
+  if(typeof value === "object"){
+    return Object.entries(value)
+      .map(([key,val])=>
+        `${key}: ${
+          typeof val === "object"
+            ? JSON.stringify(val)
+            : String(val)
+        }`
+      )
+      .join(" | ");
+  }
+
+  return String(value);
+}
+
+function openAnswerReview(resultId){
+  const item =
+    ALL_RESULTS.find(
+      result=>result.id === resultId
+    );
+
+  if(!item){
+    alert("Unable to find this result.");
+    return;
+  }
+
+  const modal =
+    document.getElementById(
+      "answerReviewModal"
+    );
+
+  const subtitle =
+    document.getElementById(
+      "answerReviewSubtitle"
+    );
+
+  const summary =
+    document.getElementById(
+      "answerReviewSummary"
+    );
+
+  const content =
+    document.getElementById(
+      "answerReviewContent"
+    );
+
+  const solverName =
+    getParticipantDisplayName(item) ||
+    clean(item.solvedByName) ||
+    "Not specified";
+
+  const solverLabel =
+    getSolverLabel(item);
+
+  subtitle.textContent =
+    `${solverLabel}: ${solverName} — ${item.activityTitle || "Activity"}`;
+
+  summary.innerHTML = `
+    <div class="answer-review-summary-item">
+      <span>Solved By</span>
+      <b>${esc(solverLabel)}</b>
+    </div>
+
+    <div class="answer-review-summary-item">
+      <span>Name</span>
+      <b>${esc(solverName)}</b>
+    </div>
+
+    <div class="answer-review-summary-item">
+      <span>Course</span>
+      <b>${esc(item.courseName || "—")}</b>
+    </div>
+
+    <div class="answer-review-summary-item">
+      <span>Score</span>
+      <b>${Number(item.score || 0)} / ${Number(item.total || 0)}</b>
+    </div>
+
+    <div class="answer-review-summary-item">
+      <span>Percentage</span>
+      <b>${Number(item.percent || 0)}%</b>
+    </div>
+  `;
+
+  const answers =
+    getSavedAnswerLog(item);
+
+  if(!answers.length){
+    content.innerHTML = `
+      <div class="answer-review-empty">
+        <i
+          class="fa-solid fa-circle-info"
+          style="font-size:32px;color:var(--blue);margin-bottom:10px">
+        </i>
+        <div>
+          No question-by-question answers were saved for this attempt.
+        </div>
+        <div style="font-size:12px;margin-top:7px;font-weight:700">
+          Older results created before the answer-log update will still show
+          their score, but their individual answers cannot be recovered.
+        </div>
+      </div>
+    `;
+  }else{
+    content.innerHTML =
+      answers.map((answer,index)=>{
+
+        const isCorrect =
+          answer?.correct === true ||
+          answer?.isCorrect === true;
+
+        const questionNumber =
+          Number(
+            answer?.questionNumber ||
+            index + 1
+          );
+
+        const questionText =
+          clean(
+            answer?.question ||
+            answer?.questionText ||
+            `Question ${questionNumber}`
+          );
+
+        const participantAnswer =
+          normalizeReviewValue(
+            answer?.studentAnswer ??
+            answer?.participantAnswer ??
+            answer?.selectedAnswer ??
+            answer?.answer ??
+            ""
+          ) || "No answer recorded";
+
+        const correctAnswer =
+          normalizeReviewValue(
+            answer?.correctAnswer ??
+            answer?.expectedAnswer ??
+            ""
+          ) || "Not available";
+
+        const questionType =
+          clean(
+            answer?.type ||
+            "Question"
+          );
+
+        return `
+          <article class="answer-review-card ${isCorrect ? "correct" : ""}">
+            <div class="answer-review-question">
+              <div class="answer-review-question-meta">
+                <span class="answer-review-chip">
+                  Question ${questionNumber}
+                </span>
+
+                <span class="answer-review-chip">
+                  ${esc(questionType)}
+                </span>
+
+                <span class="answer-review-chip ${isCorrect ? "correct" : "wrong"}">
+                  <i class="fa-solid ${isCorrect ? "fa-check" : "fa-xmark"}"></i>
+                  ${isCorrect ? "Correct" : "Incorrect"}
+                </span>
+              </div>
+
+              ${esc(questionText)}
+            </div>
+
+            <div class="answer-review-values">
+              <div class="answer-review-value">
+                <span>${esc(solverLabel)} Answer</span>
+                <b>${esc(participantAnswer)}</b>
+              </div>
+
+              <div class="answer-review-value correct-value">
+                <span>Correct Answer</span>
+                <b>${esc(correctAnswer)}</b>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+  }
+
+  modal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAnswerReviewModal(event){
+  if(
+    event &&
+    event.target !==
+      document.getElementById(
+        "answerReviewModal"
+      )
+  ){
+    return;
+  }
+
+  document
+    .getElementById(
+      "answerReviewModal"
+    )
+    ?.classList
+    .remove("show");
+
+  document.body.style.overflow = "";
+}
+
+document.addEventListener(
+  "keydown",
+  event=>{
+    if(event.key === "Escape"){
+      closeAnswerReviewModal();
+    }
+  }
+);
+
+
 function renderTable(emptyMessage="No results match the current filters."){
   const body =
     document.getElementById("resultsBody");
@@ -2699,7 +3216,7 @@ function renderTable(emptyMessage="No results match the current filters."){
   if(!FILTERED_RESULTS.length){
     body.innerHTML = `
       <tr>
-        <td colspan="12" class="empty">
+        <td colspan="13" class="empty">
           ${esc(emptyMessage)}
         </td>
       </tr>
@@ -2809,6 +3326,15 @@ function renderTable(emptyMessage="No results match the current filters."){
 
         <td>
           ${formatDate(item.createdAt)}
+        </td>
+
+        <td>
+          <button
+            class="btn btn-review btn-small"
+            onclick="openAnswerReview('${item.id}')">
+            <i class="fa-solid fa-eye"></i>
+            Review
+          </button>
         </td>
 
         <td>
