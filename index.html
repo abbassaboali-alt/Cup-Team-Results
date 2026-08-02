@@ -3194,44 +3194,42 @@ function getReviewAnswerCandidates(answer){
 }
 
 function resolveReviewParticipantAnswer(answer,correctAnswer){
+  /*
+    يعرض نفس الإجابة التي اختارها الطالب كما حُفظت وقت الضغط،
+    سواء كانت صحيحة أو خاطئة، دون استبدالها بالإجابة الصحيحة.
+  */
+  const candidates = [
+    answer?.clickedAnswer,
+    answer?.chosenAnswer,
+    answer?.selectedOptionText,
+    answer?.selectedText,
+    answer?.selectedValue,
+    answer?.participantAnswer,
+    answer?.studentAnswer,
+    answer?.selectedAnswer,
+    answer?.answer,
+    answer?.wrongAnswer
+  ]
+    .map(value=>normalizeReviewValue(value))
+    .map(value=>clean(value))
+    .filter(Boolean);
+
+  if(candidates.length){
+    return candidates[0];
+  }
+
   const isCorrect =
     answer?.correct === true ||
     answer?.isCorrect === true;
 
-  const normalizedCorrect =
-    clean(
-      normalizeReviewValue(correctAnswer)
-    ).toLowerCase();
-
-  const candidates =
-    getReviewAnswerCandidates(answer)
-      .map(value=>normalizeReviewValue(value))
-      .map(value=>clean(value))
-      .filter(Boolean);
-
-  /*
-    عند كون الإجابة خاطئة، لا نعرض الإجابة الصحيحة داخل
-    Student Answer حتى لو كانت بعض النتائج القديمة قد حفظتها
-    هناك بسبب خطأ سابق.
-  */
-  if(!isCorrect){
-    const actualWrongAnswer =
-      candidates.find(value=>
-        value.toLowerCase() !== normalizedCorrect
-      );
-
-    if(actualWrongAnswer){
-      return actualWrongAnswer;
-    }
-
-    return "Incorrect answer was not saved";
+  if(isCorrect){
+    return (
+      normalizeReviewValue(correctAnswer) ||
+      "No answer recorded"
+    );
   }
 
-  return (
-    candidates[0] ||
-    normalizeReviewValue(correctAnswer) ||
-    "No answer recorded"
-  );
+  return "The selected answer was not saved in this old attempt";
 }
 
 function openAnswerReview(resultId){
