@@ -3177,6 +3177,63 @@ function normalizeReviewValue(value){
   return String(value);
 }
 
+
+function getReviewAnswerCandidates(answer){
+  return [
+    answer?.wrongAnswer,
+    answer?.clickedAnswer,
+    answer?.chosenAnswer,
+    answer?.selectedText,
+    answer?.selectedOptionText,
+    answer?.selectedValue,
+    answer?.participantAnswer,
+    answer?.studentAnswer,
+    answer?.selectedAnswer,
+    answer?.answer
+  ];
+}
+
+function resolveReviewParticipantAnswer(answer,correctAnswer){
+  const isCorrect =
+    answer?.correct === true ||
+    answer?.isCorrect === true;
+
+  const normalizedCorrect =
+    clean(
+      normalizeReviewValue(correctAnswer)
+    ).toLowerCase();
+
+  const candidates =
+    getReviewAnswerCandidates(answer)
+      .map(value=>normalizeReviewValue(value))
+      .map(value=>clean(value))
+      .filter(Boolean);
+
+  /*
+    عند كون الإجابة خاطئة، لا نعرض الإجابة الصحيحة داخل
+    Student Answer حتى لو كانت بعض النتائج القديمة قد حفظتها
+    هناك بسبب خطأ سابق.
+  */
+  if(!isCorrect){
+    const actualWrongAnswer =
+      candidates.find(value=>
+        value.toLowerCase() !== normalizedCorrect
+      );
+
+    if(actualWrongAnswer){
+      return actualWrongAnswer;
+    }
+
+    return "Incorrect answer was not saved";
+  }
+
+  return (
+    candidates[0] ||
+    normalizeReviewValue(correctAnswer) ||
+    "No answer recorded"
+  );
+}
+
 function openAnswerReview(resultId){
   const item =
     ALL_RESULTS.find(
@@ -3288,21 +3345,18 @@ function openAnswerReview(resultId){
             `Question ${questionNumber}`
           );
 
-        const participantAnswer =
-          normalizeReviewValue(
-            answer?.studentAnswer ??
-            answer?.participantAnswer ??
-            answer?.selectedAnswer ??
-            answer?.answer ??
-            ""
-          ) || "No answer recorded";
-
         const correctAnswer =
           normalizeReviewValue(
             answer?.correctAnswer ??
             answer?.expectedAnswer ??
             ""
           ) || "Not available";
+
+        const participantAnswer =
+          resolveReviewParticipantAnswer(
+            answer,
+            correctAnswer
+          );
 
         const questionType =
           clean(
