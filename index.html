@@ -1239,6 +1239,19 @@ select:focus{
   }
 }
 
+
+.sudden-death-winner-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:7px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#fff0ee;
+  color:#b42318;
+  font-size:11px;
+  font-weight:900;
+}
 </style>
 </head>
 
@@ -2381,6 +2394,75 @@ function getSavedTeams(item){
     : [];
 }
 
+/* =========================================================
+   SUDDEN DEATH COMPATIBILITY
+   - Eliminated teams never appear as winners.
+   - If only one active team remains, it is the official winner
+     even when another eliminated team had more points.
+========================================================= */
+function isTeamBombEliminated(team){
+  return Boolean(
+    team?.bombEliminated === true ||
+    team?.eliminated === true ||
+    team?.isEliminated === true ||
+    team?.status === "eliminated" ||
+    team?.active === false
+  );
+}
+
+function getActiveSavedTeams(item){
+  return getSavedTeams(item).filter(team=>
+    !isTeamBombEliminated(team)
+  );
+}
+
+function getTeamDisplayName(team){
+  return (
+    clean(team?.name) ||
+    (clean(team?.letter) ? `Team ${clean(team.letter)}` : "") ||
+    "Unnamed Team"
+  );
+}
+
+function getSavedSuddenDeathWinnerNames(item){
+  const names = [];
+
+  const pushName = value=>{
+    const name = clean(value);
+    if(name && !names.includes(name)) names.push(name);
+  };
+
+  if(Array.isArray(item?.winningTeamNames)){
+    item.winningTeamNames.forEach(pushName);
+  }
+
+  if(Array.isArray(item?.winningTeams)){
+    item.winningTeams.forEach(team=>
+      pushName(
+        typeof team === "string"
+          ? team
+          : getTeamDisplayName(team)
+      )
+    );
+  }
+
+  pushName(item?.winningTeamName);
+  pushName(item?.suddenDeathWinnerName);
+  pushName(item?.winnerTeamName);
+
+  return names;
+}
+
+function isSuddenDeathResult(item){
+  return Boolean(
+    item?.suddenDeath === true ||
+    item?.suddenDeathWinner === true ||
+    item?.gameMode === "sudden-death" ||
+    item?.gameMode === "suddenDeath" ||
+    getSavedTeams(item).some(isTeamBombEliminated)
+  );
+}
+
 function getTeamCorrectValue(team){
   return Number(
     team?.correct ??
@@ -2401,10 +2483,23 @@ function getTeamAnsweredValue(team){
 }
 
 function getWinningTeamFromItem(item){
-  const teams = getSavedTeams(item);
+  const activeTeams = getActiveSavedTeams(item);
 
-  if(teams.length){
-    return [...teams].sort((a,b)=>
+  /* Sudden Death: the last surviving team wins immediately. */
+  if(isSuddenDeathResult(item) && activeTeams.length === 1){
+    return activeTeams[0];
+  }
+
+  const savedWinnerNames = getSavedSuddenDeathWinnerNames(item);
+  if(savedWinnerNames.length && activeTeams.length){
+    const savedWinner = activeTeams.find(team=>
+      savedWinnerNames.includes(getTeamDisplayName(team))
+    );
+    if(savedWinner) return savedWinner;
+  }
+
+  if(activeTeams.length){
+    return [...activeTeams].sort((a,b)=>
       getTeamCorrectValue(b) -
       getTeamCorrectValue(a) ||
 
@@ -2424,99 +2519,74 @@ function getWinningTeamFromItem(item){
   group, or the complete teams array.
 */
 function getWinningTeamNames(item){
+  const activeTeams = getActiveSavedTeams(item);
+  const savedNames = getSavedSuddenDeathWinnerNames(item);
 
-  const savedNames =
-    Array.isArray(item?.winningTeamNames)
-      ? item.winningTeamNames
-          .map(name=>clean(name))
-          .filter(Boolean)
-      : [];
+  /*
+    In Sudden Death, only non-eliminated teams are eligible.
+    If one team remains, it is the winner regardless of score.
+  */
+  if(isSuddenDeathResult(item)){
+    if(activeTeams.length === 1){
+      return [getTeamDisplayName(activeTeams[0])];
+    }
+
+    if(savedNames.length){
+      const activeNames = new Set(
+        activeTeams.map(getTeamDisplayName)
+      );
+
+      const validSavedNames = savedNames.filter(name=>
+        !activeTeams.length || activeNames.has(name)
+      );
+
+      if(validSavedNames.length){
+        return [...new Set(validSavedNames)];
+      }
+    }
+  }
 
   if(savedNames.length){
     return [...new Set(savedNames)];
   }
 
-  const legacyName =
-    clean(item?.winningTeamName) ||
-    clean(item?.group);
-
+  const legacyName = clean(item?.group);
   if(legacyName){
     return [legacyName];
   }
 
-  const teams =
-    getSavedTeams(item);
-
-  if(!teams.length){
+  if(!activeTeams.length){
     return [];
   }
 
-  const ranked =
-    [...teams]
-      .map(team=>({
-        ...team,
-        _correct:
-          getTeamCorrectValue(team),
-        _answered:
-          getTeamAnsweredValue(team),
-        _accuracy:
-          getTeamAnsweredValue(team)
-            ? Math.round(
-                (
-                  getTeamCorrectValue(team) /
-                  getTeamAnsweredValue(team)
-                ) * 100
-              )
-            : 0,
-        _racePosition:
-          Number(
-            team?.racePosition ||
-            0
-          )
-      }))
-      .sort((a,b)=>
-        b._racePosition -
-        a._racePosition ||
+  const ranked = [...activeTeams]
+    .map(team=>({
+      ...team,
+      _correct:getTeamCorrectValue(team),
+      _answered:getTeamAnsweredValue(team),
+      _accuracy:getTeamAnsweredValue(team)
+        ? Math.round((getTeamCorrectValue(team) / getTeamAnsweredValue(team)) * 100)
+        : 0,
+      _racePosition:Number(team?.racePosition || 0)
+    }))
+    .sort((a,b)=>
+      b._racePosition - a._racePosition ||
+      b._correct - a._correct ||
+      b._accuracy - a._accuracy ||
+      b._answered - a._answered
+    );
 
-        b._correct -
-        a._correct ||
-
-        b._accuracy -
-        a._accuracy ||
-
-        b._answered -
-        a._answered
-      );
-
-  const first =
-    ranked[0];
-
-  if(!first){
-    return [];
-  }
+  const first = ranked[0];
+  if(!first) return [];
 
   return ranked
     .filter(team=>
-      team._racePosition ===
-        first._racePosition &&
-
-      team._correct ===
-        first._correct &&
-
-      team._accuracy ===
-        first._accuracy &&
-
-      team._answered ===
-        first._answered
+      team._racePosition === first._racePosition &&
+      team._correct === first._correct &&
+      team._accuracy === first._accuracy &&
+      team._answered === first._answered
     )
-    .map(team=>
-      clean(team.name) ||
-      (
-        clean(team.letter)
-          ? `Team ${clean(team.letter)}`
-          : "Unnamed Team"
-      )
-    )
+    .map(getTeamDisplayName)
     .filter(Boolean);
 }
 
@@ -2548,7 +2618,7 @@ function getWinningGroupData(){
   FILTERED_RESULTS.forEach(item=>{
 
     const teams =
-      getSavedTeams(item);
+      getActiveSavedTeams(item);
 
     /*
       New team-mode records contain a complete
@@ -2921,7 +2991,10 @@ function renderLeaders(){
       `Correct Answers: <b>${winningGroup.totalCorrect}</b><br>` +
       `Answered Questions: <b>${winningGroup.totalAnswered}</b><br>` +
       `Accuracy: <b>${winningGroup.accuracy}%</b><br>` +
-      `Course: <b>${esc(winningGroup.courseName)}</b>`;
+      `Course: <b>${esc(winningGroup.courseName)}</b>` +
+      `${FILTERED_RESULTS.some(isSuddenDeathResult)
+        ? `<br><span style="display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;background:#fff0ee;color:#b42318;font-weight:900">💣 Sudden Death Winner — eliminated teams excluded</span>`
+        : ""}`;
 }
 
 function getScoreClass(percent){
@@ -4368,10 +4441,10 @@ function renderTable(emptyMessage="No results match the current filters."){
         </td>
 
         <td>
-          ${esc(
-            getWinningTeamName(item) ||
-            "—"
-          )}
+          <b>${esc(getWinningTeamName(item) || "—")}</b>
+          ${isSuddenDeathResult(item)
+            ? `<div style="margin-top:5px;font-size:10px;font-weight:900;color:#b42318">💣 Sudden Death Winner</div>`
+            : ""}
         </td>
 
         <td>
@@ -4519,6 +4592,7 @@ function exportCSV(){
     "Period",
     "Winning Group(s)",
     "Winning Group Correct",
+    "Competition Mode",
     "Score",
     "Total",
     "Percentage",
@@ -4536,9 +4610,11 @@ function exportCSV(){
     item.period || "",
     getWinningTeamName(item),
     Number(
-      item.winningTeamCorrect ||
-      0
+      getWinningTeamFromItem(item)
+        ? getTeamCorrectValue(getWinningTeamFromItem(item))
+        : item.winningTeamCorrect || 0
     ),
+    isSuddenDeathResult(item) ? "Sudden Death" : "Standard",
     Number(item.score || 0),
     Number(item.total || 0),
     Number(item.percent || 0),
